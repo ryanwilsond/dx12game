@@ -62,6 +62,7 @@ public class Engine {
     public void OnDestroy() {
         Console.PrintLine("OnDestroy");
         _isRunning = false;
+        _renderer.Destruct();
         LowLevel.FreeCharPtrString(_lpszClassName);
         LowLevel.FreeCharPtrString(_windowName);
         LowLevel.FreeGCHandle(_gcPtr);

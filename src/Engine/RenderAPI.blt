@@ -1,6 +1,92 @@
 
 public class RenderAPI {
-    public void Initialize(int64* hWnd) {
+    private D12Device _device;
+    private char* _deviceName;
 
+    public void Initialize(int64* hWnd) {
+        var factory = new DXGIFactory();
+        var adapter = factory.GetAdapter();
+
+        DXGI_ADAPTER_DESC desc = new DXGI_ADAPTER_DESC();
+
+        var adapterVtbl = *(void***)adapter.ptr;
+        var GetDesc =                       (int32!(IDXGIAdapter* a, DXGI_ADAPTER_DESC* b)*)            ((void*)(*((void**)(((int64!)adapterVtbl) + 8 * 8))));
+        var hr = GetDesc(adapter.ptr, &desc);
+
+        if (hr != 0) {
+            Console.Print("GetDesc failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
+
+        string gpu = LowLevel.ReadLPCSTR((void*)&desc);
+
+        Console.PrintLine("Selected device: " + gpu);
+
+        _device = new D12Device(adapter.ptr);
+        _deviceName = LowLevel.CreateCharPtrString("Main Virtual Device");
+
+
+        var deviceVtbl = *(void***)_device.ptr;
+        var SetName =                       (int32!(ID3D12Device* a, char* b)*)                         ((void*)(*((void**)(((int64!)deviceVtbl) + 6 * 8))));
+        hr = SetName(_device.ptr, _deviceName);
+
+        if (hr != 0) {
+            Console.Print("SetName failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
     }
+
+    public void Destruct() {
+        LowLevel.FreeCharPtrString(_deviceName);
+    }
+}
+
+public struct LUID {
+    public uint32! LowPart;
+    public int32! HighPart;
+}
+
+public struct DXGI_ADAPTER_DESC {
+    uint64! d_0;
+    uint64! d_1;
+    uint64! d_2;
+    uint64! d_3;
+    uint64! d_4;
+    uint64! d_5;
+    uint64! d_6;
+    uint64! d_7;
+    uint64! d_8;
+    uint64! d_9;
+    uint64! d_10;
+    uint64! d_11;
+    uint64! d_12;
+    uint64! d_13;
+    uint64! d_14;
+    uint64! d_15;
+    uint64! d_16;
+    uint64! d_17;
+    uint64! d_18;
+    uint64! d_19;
+    uint64! d_20;
+    uint64! d_21;
+    uint64! d_22;
+    uint64! d_23;
+    uint64! d_24;
+    uint64! d_25;
+    uint64! d_26;
+    uint64! d_27;
+    uint64! d_28;
+    uint64! d_29;
+    uint64! d_30;
+    uint64! d_31;
+    public uint32! VendorId;
+    public uint32! DeviceId;
+    public uint32! SubSysId;
+    public uint32! Revision;
+    public int64! DedicatedVideoMemory;
+    public int64! DedicatedSystemMemory;
+    public int64! SharedSystemMemory;
+    public LUID AdapterLuid;
 }

@@ -1,5 +1,3 @@
-using WINBOOL = bool!;
-using LONG = int32!;
 
 public struct WNDCLASSEX {
     public uint32! cbSize;
@@ -41,10 +39,10 @@ public struct GUID {
 }
 
 public struct RECT {
-    public LONG left;
-    public LONG top;
-    public LONG right;
-    public LONG bottom;
+    public int32! left;
+    public int32! top;
+    public int32! right;
+    public int32! bottom;
 }
 
 public struct PAINTSTRUCT {

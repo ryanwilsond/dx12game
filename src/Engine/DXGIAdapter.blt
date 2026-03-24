@@ -1,0 +1,8 @@
+
+public class DXGIAdapter {
+    public constructor(IDXGIAdapter* adapter) {
+        ptr = adapter;
+    }
+
+    public IDXGIAdapter* ptr;
+}

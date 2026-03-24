@@ -1,0 +1,32 @@
+
+public class D12Device {
+    public constructor() { }
+
+    public constructor(IDXGIAdapter* pAdapter) {
+        Initialize(pAdapter);
+    }
+
+    public void Initialize(IDXGIAdapter* pAdapter) {
+        // __uuid(ID3D12Device)
+        var deviceGuid = Helpers.MakeGUID(0x189819f1, 0x1db6, 0x4b57, new int![]! { 0xbe, 0x54, 0x18, 0x21, 0x33, 0x9b, 0x85, 0xf7 });
+
+        var hr = D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_1_0_CORE, &deviceGuid, (void**)&ptr);
+
+        if (hr != 0) {
+            Console.Print("D3D12CreateDevice failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
+    }
+
+    public ID3D12Device* ptr;
+
+    constexpr int32! D3D_FEATURE_LEVEL_1_0_CORE = 0x1000;
+
+    [DllImport("d3d12.dll")]
+    static extern int32! D3D12CreateDevice(void* adapter, int32! featureLevel, GUID* riid, void** device);
+}
+
+public struct ID3D12Device {
+    public void** lpVtbl;
+}
