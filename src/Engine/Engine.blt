@@ -59,19 +59,20 @@ public class Engine {
         return true;
     }
 
+    public void OnCreate(int64* hWnd) {
+        Console.PrintLine("OnCreate");
+        _renderer = new RenderAPI();
+        _renderer.Initialize(hWnd);
+    }
+
     public void OnDestroy() {
         Console.PrintLine("OnDestroy");
+        DXGIDebug.Get().GetLiveObjects();
         _isRunning = false;
         _renderer.Destruct();
         LowLevel.FreeCharPtrString(_lpszClassName);
         LowLevel.FreeCharPtrString(_windowName);
         LowLevel.FreeGCHandle(_gcPtr);
-    }
-
-    public void OnCreate(int64* hWnd) {
-        Console.PrintLine("OnCreate");
-        _renderer = new RenderAPI();
-        _renderer.Initialize(hWnd);
     }
 
     public void Update() {
@@ -103,15 +104,6 @@ public class Engine {
             obj.OnDestroy();
             PostQuitMessage(0);
         }
-        // else if (msg == WM_PAINT) {
-        //     var ps = new PAINTSTRUCT();
-        //     var hdc = BeginPaint(hWnd, &ps);
-
-        //     var hbr = CreateSolidBrush(RGB(0x64, 0x95, 0xED));
-        //     FillRect(hdc, &ps.rcPaint, hbr);
-
-        //     EndPaint(hWnd, &ps);
-        // } else
 
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }
@@ -128,7 +120,6 @@ public class Engine {
     constexpr int32! CW_USEDEFAULT = (int32!)0x80000000;
 
     constexpr uint32! WM_DESTROY = 0x0002;
-    constexpr uint32! WM_PAINT = 0x000F;
     constexpr uint32! WM_NCCREATE = 0x0081;
     constexpr uint32! WM_CREATE = 0x0001;
 
@@ -187,12 +178,6 @@ public class Engine {
     static extern int64* DispatchMessage(MSG* lpMsg);
 
     [DllImport("user32.dll")]
-    static extern int64* BeginPaint(int64* hWnd, PAINTSTRUCT* lpPaint);
-
-    [DllImport("user32.dll")]
-    static extern bool! EndPaint(int64* hWnd, PAINTSTRUCT* lpPaint);
-
-    [DllImport("user32.dll")]
     static extern int64* LoadCursor(int64* hInstance, char* lpCursorName);
 
     [DllImport("user32.dll")]
@@ -203,11 +188,4 @@ public class Engine {
 
     [DllImport("user32.dll")]
     static extern int64* GetWindowLongPtr(int64* hWnd, int32! index);
-
-    [DllImport("user32.dll")]
-    static extern int32! FillRect(int64* hdc, RECT* lprc, int64* hbr);
-
-    [DllImport("gdi32.dll")]
-    static extern int64* CreateSolidBrush(uint32! colorref);
-
 }

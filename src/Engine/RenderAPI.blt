@@ -1,41 +1,51 @@
 
 public class RenderAPI {
     private D12Device _device;
+    private D12CommandQueue _commandQueue;
+    private D12CommandList _commandList;
     private char* _deviceName;
 
     public void Initialize(int64* hWnd) {
+        D12Debug.Get().Enable();
+
         var factory = new DXGIFactory();
         var adapter = factory.GetAdapter();
 
-        DXGI_ADAPTER_DESC desc = new DXGI_ADAPTER_DESC();
+        // Debug
+        {
+            DXGI_ADAPTER_DESC desc = new DXGI_ADAPTER_DESC();
 
-        var adapterVtbl = *(void***)adapter.ptr;
-        var GetDesc =                       (int32!(IDXGIAdapter* a, DXGI_ADAPTER_DESC* b)*)            ((void*)(*((void**)(((int64!)adapterVtbl) + 8 * 8))));
-        var hr = GetDesc(adapter.ptr, &desc);
+            var adapterVtbl = *(void***)adapter.ptr;
+            var GetDesc =                       (int32!(IDXGIAdapter* a, DXGI_ADAPTER_DESC* b)*)            ((void*)(*((void**)(((int64!)adapterVtbl) + 8 * 8))));
+            var d_hr = GetDesc(adapter.ptr, &desc);
 
-        if (hr != 0) {
-            Console.Print("GetDesc failed: ");
-            Console.PrintLine(hr);
-            return;
+            if (d_hr != 0) {
+                Console.Print("GetDesc failed: ");
+                Console.PrintLine(d_hr);
+            } else {
+                string gpu = LowLevel.ReadLPCSTR((void*)&desc);
+                Console.PrintLine("Selected device: " + gpu);
+            }
         }
-
-        string gpu = LowLevel.ReadLPCSTR((void*)&desc);
-
-        Console.PrintLine("Selected device: " + gpu);
 
         _device = new D12Device(adapter.ptr);
         _deviceName = LowLevel.CreateCharPtrString("Main Virtual Device");
 
-
         var deviceVtbl = *(void***)_device.ptr;
         var SetName =                       (int32!(ID3D12Device* a, char* b)*)                         ((void*)(*((void**)(((int64!)deviceVtbl) + 6 * 8))));
-        hr = SetName(_device.ptr, _deviceName);
+        var hr = SetName(_device.ptr, _deviceName);
 
         if (hr != 0) {
             Console.Print("SetName failed: ");
             Console.PrintLine(hr);
             return;
         }
+
+        _commandQueue = new D12CommandQueue();
+        _commandQueue.Initialize(_device.ptr);
+
+        _commandList = new D12CommandList();
+        _commandList.Initialize(_device.ptr);
     }
 
     public void Destruct() {

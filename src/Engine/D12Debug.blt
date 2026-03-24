@@ -1,0 +1,41 @@
+
+public class D12Debug {
+
+    public static D12Debug Get() {
+        return Instance;
+    }
+
+    public void Enable() {
+        // __uuid(ID3D12Debug)
+        var debugGuid = Helpers.MakeGUID(0x344488b7, 0x6846, 0x474b, new int![]! { 0xb9, 0x89, 0xf0, 0x27, 0x44, 0x82, 0x45, 0xe0 });
+
+        var hr = D3D12GetDebugInterface(&debugGuid, (void**)&ptr);
+
+        if (hr != 0) {
+            Console.Print("D3D12GetDebugInterface failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
+
+        var debugVtbl = *(void***)ptr;
+        var EnableDebugLayer =           (int32!(ID3D12Debug* a)*)                         ((void*)(*((void**)(((int64!)debugVtbl) + 3 * 8))));
+        hr = EnableDebugLayer(ptr);
+
+        if (hr != 0) {
+            Console.Print("EnableDebugLayer failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
+    }
+
+    public ID3D12Debug* ptr;
+
+    public static D12Debug Instance = new D12Debug();
+
+    [DllImport("d3d12.dll")]
+    static extern int32! D3D12GetDebugInterface(GUID* riid, void** debug);
+}
+
+public struct ID3D12Debug {
+    void** lpVtbl;
+}
