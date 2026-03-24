@@ -1,0 +1,75 @@
+using WINBOOL = bool!;
+using LONG = int32!;
+
+public struct WNDCLASSEX {
+    public uint32! cbSize;
+    public uint32! style;
+    public int64*(int64* hWnd, uint32! msg, int64* wParam, int64* lParam)* lpfnWndProc;
+    public int32! cbClsExtra;
+    public int32! cbWndExtra;
+    public int64* hInstance;
+    public int64* hIcon;
+    public int64* hCursor;
+    public int64* hbrBackground;
+    public char* lpszMenuName;
+    public char* lpszClassName;
+    public int64* hIconSm;
+}
+
+public struct MSG {
+    public int64* hWnd;
+    public uint32! message;
+    public int64* wParam;
+    public int64* lParam;
+    public uint32! time;
+    public int32! pt_x;
+    public int32! pt_y;
+}
+
+public struct GUID {
+    public uint32! data1;
+    public uint16! data2;
+    public uint16! data3;
+    public uint8! data4_0;
+    public uint8! data4_1;
+    public uint8! data4_2;
+    public uint8! data4_3;
+    public uint8! data4_4;
+    public uint8! data4_5;
+    public uint8! data4_6;
+    public uint8! data4_7;
+}
+
+public struct RECT {
+    public LONG left;
+    public LONG top;
+    public LONG right;
+    public LONG bottom;
+}
+
+public struct PAINTSTRUCT {
+    public int64* hdc;
+    public bool! fErase;
+    public RECT rcPaint;
+    public bool! fRestore;
+    public bool! fIncUpdate;
+    uint64! res0;
+    uint64! res1;
+    uint64! res2;
+    uint64! res3;
+}
+
+public struct CREATESTRUCTA {
+    public void* lpCreateParams;
+    public int64* hInstance;
+    public int64* hMenu;
+    public int64* hwndParent;
+    public int32! cy;
+    public int32! cx;
+    public int32! y;
+    public int32! x;
+    public int32! style;
+    public char* lpszName;
+    public char* lpszClass;
+    public uint32! dwExStyle;
+}

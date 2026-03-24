@@ -1,0 +1,6 @@
+
+public class RenderAPI {
+    public void Initialize(int64* hWnd) {
+
+    }
+}

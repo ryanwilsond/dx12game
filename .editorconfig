@@ -1,0 +1,34 @@
+# Top-most EditorConfig file
+root = true
+
+[*]
+indent_style = space
+trim_trailing_whitespace = true
+end_of_line = crlf
+insert_final_newline = true
+
+# Code files
+[*.{blt}]
+indent_size = 4
+charset = utf-8
+
+# XML project and config files
+[*.{xml,yml,csproj,msproj,Build.props,Build.targets,config}]
+indent_size = 2
+
+# JSON files
+[*.json]
+indent_size = 4
+insert_final_newline = true
+
+# Text files
+[*.txt]
+indent_sze = 4
+
+# Documentation files
+[*.md]
+indent_size = 2
+
+# Makfiles
+[Makefile]
+indent_style = tab

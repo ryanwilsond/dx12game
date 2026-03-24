@@ -1,0 +1,212 @@
+
+public class Engine {
+    private bool! _isRunning = false;
+    private int64* _hWnd = (int64*)null;
+    private char* _windowName;
+    private char* _lpszClassName;
+    private RenderAPI _renderer;
+    private void* _gcPtr;
+
+    public bool! Initialize() {
+        var hInstance = GetModuleHandle(null);
+        var wc = new WNDCLASSEX();
+        wc.cbSize = (uint32!)LowLevel.SizeOf<WNDCLASSEX>();
+        wc.lpfnWndProc = &WndProcImpl;
+        wc.hInstance = hInstance;
+        wc.hbrBackground = (int64*)COLOR_WINDOW;
+        wc.style = 0;
+        wc.hCursor = LoadCursor(null, (char*)IDC_ARROW);
+        wc.hIcon = LoadIcon(null, (char*)IDI_APPLICATION);
+        wc.lpszMenuName = (char*)0;
+        wc.cbClsExtra = 0;
+        wc.cbWndExtra = 0;
+
+        _lpszClassName = LowLevel.CreateCharPtrString("ExampleWindowClass");
+        wc.lpszClassName = _lpszClassName;
+        _windowName = LowLevel.CreateCharPtrString("Example Window");
+
+        if (RegisterClassEx(&wc) == 0) {
+            Console.PrintLine("RegisterClassEx failed");
+            return false;
+        }
+
+        _gcPtr = LowLevel.GetGCPtr(this);
+
+        _hWnd = CreateWindowEx(
+            0,
+            wc.lpszClassName,
+            _windowName,
+            (uint32!)(WS_OVERLAPPEDWINDOW | WS_VISIBLE),
+            CW_USEDEFAULT,
+            CW_USEDEFAULT,
+            800,
+            600,
+            (int64*)0,
+            (int64*)0,
+            hInstance,
+            (int64*)_gcPtr
+        );
+
+        if (((int64!)_hWnd) == 0) {
+            Console.PrintLine("CreateWindowEx failed");
+            return false;
+        }
+
+        ShowWindow(_hWnd, SW_SHOW);
+        UpdateWindow(_hWnd);
+
+        _isRunning = true;
+        return true;
+    }
+
+    public void OnDestroy() {
+        Console.PrintLine("OnDestroy");
+        _isRunning = false;
+        LowLevel.FreeCharPtrString(_lpszClassName);
+        LowLevel.FreeCharPtrString(_windowName);
+        LowLevel.FreeGCHandle(_gcPtr);
+    }
+
+    public void OnCreate(int64* hWnd) {
+        Console.PrintLine("OnCreate");
+        _renderer = new RenderAPI();
+        _renderer.Initialize(hWnd);
+    }
+
+    public void Update() {
+        MSG msg = new MSG();
+
+        while (PeekMessage(&msg, (int64*)0, 0, 0, PM_REMOVE) > 0) {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+    }
+
+    public bool! IsRunning() {
+        return _isRunning;
+    }
+
+    static int64* WndProcImpl(int64* hWnd, uint32! msg, int64* wParam, int64* lParam) {
+        if (msg == WM_NCCREATE) {
+            var param = (CREATESTRUCTA*)lParam;
+            var ptr = (void*)param->lpCreateParams;
+            SetWindowLongPtr(hWnd, GWLP_USERDATA, (int64*)ptr);
+            Console.PrintLine("Created window");
+        } else if (msg == WM_CREATE) {
+            var ptr = (void*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+            var obj = (Engine)LowLevel.GetObject(ptr);
+            obj.OnCreate(hWnd);
+        } else if (msg == WM_DESTROY) {
+            var ptr = (void*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+            var obj = (Engine)LowLevel.GetObject(ptr);
+            obj.OnDestroy();
+            PostQuitMessage(0);
+        }
+        // else if (msg == WM_PAINT) {
+        //     var ps = new PAINTSTRUCT();
+        //     var hdc = BeginPaint(hWnd, &ps);
+
+        //     var hbr = CreateSolidBrush(RGB(0x64, 0x95, 0xED));
+        //     FillRect(hdc, &ps.rcPaint, hbr);
+
+        //     EndPaint(hWnd, &ps);
+        // } else
+
+        return DefWindowProc(hWnd, msg, wParam, lParam);
+    }
+
+    private static uint32! RGB(uint8! r, uint8! g, uint8! b) {
+        return (uint32!)(r | (g << 8) | (b << 16));
+    }
+
+    constexpr int32! SW_SHOW = 5;
+
+    constexpr uint32! WS_OVERLAPPEDWINDOW = 0x00CF0000;
+    constexpr uint32! WS_VISIBLE = 0x10000000;
+
+    constexpr int32! CW_USEDEFAULT = (int32!)0x80000000;
+
+    constexpr uint32! WM_DESTROY = 0x0002;
+    constexpr uint32! WM_PAINT = 0x000F;
+    constexpr uint32! WM_NCCREATE = 0x0081;
+    constexpr uint32! WM_CREATE = 0x0001;
+
+    constexpr uint32! COLOR_WINDOW = 5;
+
+    constexpr uint32! IDC_ARROW = 32512;
+    constexpr uint32! IDI_APPLICATION = 32512;
+
+    constexpr uint32! PM_REMOVE = 0x0001;
+
+    constexpr int32! GWLP_USERDATA = (int32!)(-21);
+
+    [DllImport("user32.dll")]
+    static extern uint16! RegisterClassEx(WNDCLASSEX* lpwcx);
+
+    [DllImport("user32.dll")]
+    static extern int64* CreateWindowEx(
+        uint32! dwExStyle,
+        char* lpClassName,
+        char* lpWindowName,
+        uint32! dwStyle,
+        int32! x,
+        int32! y,
+        int32! nWidth,
+        int32! nHeight,
+        int64* hWndParent,
+        int64* hMenu,
+        int64* hInstance,
+        int64* lpParam);
+
+    [DllImport("kernel32.dll")]
+    static extern int64* GetModuleHandle(string lpModuleName);
+
+    [DllImport("user32.dll")]
+    static extern void PostQuitMessage(int32! nExitCode);
+
+    [DllImport("user32.dll")]
+    static extern int64* DefWindowProc(int64* hWnd, uint32! msg, int64* wParam, int64* lParam);
+
+    [DllImport("user32.dll")]
+    static extern bool! ShowWindow(int64* hWnd, int32! nCmdShow);
+
+    [DllImport("user32.dll")]
+    static extern bool! UpdateWindow(int64* hWnd);
+
+    [DllImport("user32.dll")]
+    static extern int8! GetMessage(MSG* lpMsg, int64* hWnd, uint32! min, uint32! max);
+
+    [DllImport("user32.dll")]
+    static extern int8! PeekMessage(MSG* lpMsg, int64* hWnd, uint32! min, uint32! max, uint32! wRemoveMsg);
+
+    [DllImport("user32.dll")]
+    static extern bool! TranslateMessage(MSG* lpMsg);
+
+    [DllImport("user32.dll")]
+    static extern int64* DispatchMessage(MSG* lpMsg);
+
+    [DllImport("user32.dll")]
+    static extern int64* BeginPaint(int64* hWnd, PAINTSTRUCT* lpPaint);
+
+    [DllImport("user32.dll")]
+    static extern bool! EndPaint(int64* hWnd, PAINTSTRUCT* lpPaint);
+
+    [DllImport("user32.dll")]
+    static extern int64* LoadCursor(int64* hInstance, char* lpCursorName);
+
+    [DllImport("user32.dll")]
+    static extern int64* LoadIcon(int64* hInstance, char* lpIconName);
+
+    [DllImport("user32.dll")]
+    static extern int64* SetWindowLongPtr(int64* hWnd, int32! index, int64* dwNewLong);
+
+    [DllImport("user32.dll")]
+    static extern int64* GetWindowLongPtr(int64* hWnd, int32! index);
+
+    [DllImport("user32.dll")]
+    static extern int32! FillRect(int64* hdc, RECT* lprc, int64* hbr);
+
+    [DllImport("gdi32.dll")]
+    static extern int64* CreateSolidBrush(uint32! colorref);
+
+}
