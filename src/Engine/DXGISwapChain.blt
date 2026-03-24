@@ -1,0 +1,203 @@
+
+public class DXGISwapChain {
+    private ID3D12Resource* _renderTarget1;
+    private ID3D12Resource* _renderTarget2;
+    private ID3D12DescriptorHeap* _rTVHeap;
+    private ID3D12Device* _device;
+    private uint32! _bufferCount = 0;
+    private uint32! _currentBuffer = 0;
+    private uint32! _width = 0;
+    private uint32! _height = 0;
+    private uint32! _heapIncrement = 0;
+
+    public void Initialize(ID3D12Device* pDevice, IDXGIFactory2* pFactory, ID3D12CommandQueue* pQueue, int64* hWnd, uint32! width, uint32! height) {
+        DXGI_SWAP_CHAIN_DESC1 desc = new DXGI_SWAP_CHAIN_DESC1();
+        desc.Width = width;
+        desc.Height = height;
+        desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+        desc.Stereo = false;
+        desc.SampleDesc = new DXGI_SAMPLE_DESC();
+        desc.SampleDesc.Count = 1;
+        desc.SampleDesc.Quality = 0;
+        desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+        desc.BufferCount = 2;
+        desc.Scaling = DXGI_SCALING_NONE;
+        desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+        desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+        desc.Flags = (uint32!)(DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+
+        _width = width;
+        _height = height;
+        _bufferCount = 2;
+
+        var factoryVtbl = *(void***)pFactory;
+        var CreateSwapChainForHwnd = (int32!(IDXGIFactory2* a, ID3D12CommandQueue* b, int64* c, DXGI_SWAP_CHAIN_DESC1* d, void* e, void* f, void** g)*)   ((void*)(*((void**)(((int64!)factoryVtbl) + 15 * 8))));
+        var hr = CreateSwapChainForHwnd(pFactory, pQueue, hWnd, &desc, (void*)null, (void*)null, (void**)&ptr);
+
+        if (hr != 0) {
+            Console.Print("CreateSwapChainForHwnd failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
+
+        // __uuid(ID3D12DescriptorHeap)
+        var heapGuid = Helpers.MakeGUID(0x8efb471d, 0x616c, 0x4f49, new int![]! { 0x90, 0xf7, 0x12, 0x7b, 0xb7, 0x63, 0xfa, 0x51 });
+
+        D3D12_DESCRIPTOR_HEAP_DESC heapDesc = new D3D12_DESCRIPTOR_HEAP_DESC();
+        heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+        heapDesc.NumDescriptors = 2;
+        heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+        heapDesc.NodeMask = 0;
+
+        var deviceVtbl = *(void***)pDevice;
+        var CreateDescriptorHeap =        (int32!(ID3D12Device* a, D3D12_DESCRIPTOR_HEAP_DESC* b, GUID* c, void** d)*)                   ((void*)(*((void**)(((int64!)deviceVtbl) + 14 * 8))));
+        hr = CreateDescriptorHeap(pDevice, &heapDesc, &heapGuid, (void**)&_rTVHeap);
+
+        if (hr != 0) {
+            Console.Print("CreateDescriptorHeap failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
+
+        var GetDescriptorHandleIncrementSize =        (uint32!(ID3D12Device* a, uint32! b)*)                   ((void*)(*((void**)(((int64!)deviceVtbl) + 15 * 8))));
+        _heapIncrement = GetDescriptorHandleIncrementSize(pDevice, heapDesc.Type);
+
+        _device = pDevice;
+
+        CreateBuffers();
+    }
+
+    public void CreateBuffers() {
+        // __uuid(ID3D12Resource)
+        var resGuid = Helpers.MakeGUID(0x696442be, 0xa72e, 0x4059, new int![]! { 0xbc, 0x79, 0x5b, 0x5c, 0x98, 0x04, 0x0f, 0xad });
+
+        var scVtbl = *(void***)ptr;
+        var GetBuffer = (int32!(IDXGISwapChain1* a, uint32! b, GUID* c, void** g)*)   ((void*)(*((void**)(((int64!)scVtbl) + 9 * 8))));
+        var hr = GetBuffer(ptr, 0, &resGuid, (void**)&_renderTarget1);
+
+        if (hr != 0) {
+            Console.Print("GetBuffer failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
+
+        hr = GetBuffer(ptr, 1, &resGuid, (void**)&_renderTarget2);
+
+        if (hr != 0) {
+            Console.Print("GetBuffer failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
+
+        D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = new D3D12_CPU_DESCRIPTOR_HANDLE();
+
+        var heapVtbl = *(void***)_rTVHeap;
+        var GetCPUDescriptorHandleForHeapStart = (void(ID3D12DescriptorHeap* a, D3D12_CPU_DESCRIPTOR_HANDLE* b)*)   ((void*)(*((void**)(((int64!)heapVtbl) + 9 * 8))));
+        GetCPUDescriptorHandleForHeapStart(_rTVHeap, &cpuHandle);
+
+        var deviceVtbl = *(void***)_device;
+        var CreateRenderTargetView = (void(ID3D12Device* a, ID3D12Resource* b, void* c, D3D12_CPU_DESCRIPTOR_HANDLE d)*)   ((void*)(*((void**)(((int64!)deviceVtbl) + 20 * 8))));
+
+        // D3D12_RENDER_TARGET_VIEW_DESC desc = new D3D12_RENDER_TARGET_VIEW_DESC();
+        // desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+        // desc.ViewDimension = 0;
+
+        // cpuHandle.ptr = (uint64*)(((uint64!)cpuHandle.ptr) + (uint64!)(_heapIncrement));
+        CreateRenderTargetView(_device, _renderTarget1, (void*)null, cpuHandle);
+
+        cpuHandle.ptr = (uint64*)(((uint64!)cpuHandle.ptr) + (uint64!)(_heapIncrement));
+        CreateRenderTargetView(_device, _renderTarget2, (void*)null, cpuHandle);
+    }
+
+    public void Present() {
+        var scVtbl = *(void***)ptr;
+        var Present = (uint32!(IDXGISwapChain1* a, uint32! b, uint32! c)*)   ((void*)(*((void**)(((int64!)scVtbl) + 8 * 8))));
+        var hr = Present(ptr, 0, 0);
+
+        if (hr != 0) {
+            Console.Print("Present failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
+
+        _currentBuffer = (uint32!)((_currentBuffer + 1) % 2);
+    }
+
+    public ID3D12Resource* GetCurrentRenderTarget() {
+        if (_currentBuffer == 0)
+            return _renderTarget1;
+        else
+            return _renderTarget2;
+    }
+
+    public D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentRTVHandle() {
+        D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = new D3D12_CPU_DESCRIPTOR_HANDLE();
+
+        var heapVtbl = *(void***)_rTVHeap;
+        var GetCPUDescriptorHandleForHeapStart = (void(ID3D12DescriptorHeap* a, D3D12_CPU_DESCRIPTOR_HANDLE* b)*)   ((void*)(*((void**)(((int64!)heapVtbl) + 9 * 8))));
+        GetCPUDescriptorHandleForHeapStart(_rTVHeap, &cpuHandle);
+        cpuHandle.ptr = (uint64*)(((uint64!)cpuHandle.ptr) + (uint64!)(_heapIncrement * _currentBuffer));
+        return cpuHandle;
+    }
+
+    public IDXGISwapChain1* ptr;
+
+    constexpr uint32! DXGI_FORMAT_R16G16B16A16_FLOAT = 10;
+    constexpr uint32! DXGI_USAGE_RENDER_TARGET_OUTPUT = 0x00000020;
+    constexpr uint32! DXGI_SCALING_NONE = 1;
+    constexpr uint32! DXGI_SWAP_EFFECT_FLIP_DISCARD = 4;
+    constexpr uint32! DXGI_ALPHA_MODE_IGNORE = 3;
+    constexpr uint32! DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING = 2048;
+    constexpr uint32! DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH = 2;
+    constexpr uint32! D3D12_DESCRIPTOR_HEAP_TYPE_RTV = 2;
+    constexpr uint32! D3D12_DESCRIPTOR_HEAP_FLAG_NONE = 0;
+}
+
+public struct D3D12_CPU_DESCRIPTOR_HANDLE {
+    public uint64* ptr;
+}
+
+public struct IDXGISwapChain1 {
+    public void** lpVtbl;
+}
+
+public struct ID3D12Resource {
+    public void** lpVtbl;
+}
+
+public struct ID3D12DescriptorHeap {
+    public void** lpVtbl;
+}
+
+public struct DXGI_SAMPLE_DESC {
+    public uint32! Count;
+    public uint32! Quality;
+}
+
+public struct DXGI_SWAP_CHAIN_DESC1 {
+    public uint32! Width;
+    public uint32! Height;
+    public uint32! Format;
+    public bool! Stereo;
+    public DXGI_SAMPLE_DESC SampleDesc;
+    public uint32! BufferUsage;
+    public uint32! BufferCount;
+    public uint32! Scaling;
+    public uint32! SwapEffect;
+    public uint32! AlphaMode;
+    public uint32! Flags;
+}
+
+public struct D3D12_DESCRIPTOR_HEAP_DESC {
+    public uint32! Type;
+    public uint32! NumDescriptors;
+    public uint32! Flags;
+    public uint32! NodeMask;
+}
+
+public struct D3D12_RENDER_TARGET_VIEW_DESC {
+    public uint32! Format;
+    public uint32! ViewDimension;
+    uint64! d0;
+    uint64! d1;
+}

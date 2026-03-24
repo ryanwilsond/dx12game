@@ -6,6 +6,8 @@ public class Engine {
     private char* _lpszClassName;
     private RenderAPI _renderer;
     private void* _gcPtr;
+    private uint32! _width = 1280;
+    private uint32! _height = 720;
 
     public bool! Initialize() {
         var hInstance = GetModuleHandle(null);
@@ -39,8 +41,8 @@ public class Engine {
             (uint32!)(WS_OVERLAPPEDWINDOW | WS_VISIBLE),
             CW_USEDEFAULT,
             CW_USEDEFAULT,
-            800,
-            600,
+            (int32!)_width,
+            (int32!)_height,
             (int64*)0,
             (int64*)0,
             hInstance,
@@ -62,7 +64,7 @@ public class Engine {
     public void OnCreate(int64* hWnd) {
         Console.PrintLine("OnCreate");
         _renderer = new RenderAPI();
-        _renderer.Initialize(hWnd);
+        _renderer.Initialize(hWnd, _width, _height);
     }
 
     public void OnDestroy() {
@@ -82,6 +84,8 @@ public class Engine {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+
+        _renderer.UpdateDraw();
     }
 
     public bool! IsRunning() {

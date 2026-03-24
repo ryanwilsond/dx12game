@@ -29,9 +29,29 @@ public class D12CommandList {
         }
     }
 
+    public void ResetCommandList() {
+        var alVtbl = *(void***)_allocator;
+        var ResetAl =       (int32!(ID3D12CommandAllocator* a)*)    ((void*)(*((void**)(((int64!)alVtbl) + 8 * 8))));
+        ResetAl(_allocator);
+
+        ID3D12GraphicsCommandList* gcl = GFXCmd();
+
+        var gclVtbl = *(void***)gcl;
+        var ResetGcl =       (int32!(ID3D12GraphicsCommandList* a, ID3D12CommandAllocator* b, void* c)*)    ((void*)(*((void**)(((int64!)gclVtbl) + 10 * 8))));
+        ResetGcl(gcl, _allocator, (void*)null);
+    }
+
+    public ID3D12GraphicsCommandList* GFXCmd() {
+        return (ID3D12GraphicsCommandList*)ptr;
+    }
+
     public ID3D12CommandList* ptr;
 
     constexpr int32! D3D12_COMMAND_LIST_TYPE_DIRECT = 0;
+}
+
+public struct ID3D12GraphicsCommandList {
+    public void** lpVtbl;
 }
 
 public struct ID3D12CommandAllocator {

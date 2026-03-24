@@ -36,6 +36,16 @@ public class D12CommandQueue {
         }
     }
 
+    public void ExecuteCommandLists(ID3D12CommandList* pCommandList) {
+        var gqlVtbl = *(void***)ptr;
+        var ExecuteCommandLists =       (int32!(ID3D12CommandQueue* a, uint32! b, void** c)*)    ((void*)(*((void**)(((int64!)gqlVtbl) + 10 * 8))));
+        ExecuteCommandLists(ptr, 1, (void**)&pCommandList);
+        _currentFenceValue = (uint64!)(_currentFenceValue + 1);
+
+        var Signal =       (int32!(ID3D12CommandQueue* a, ID3D12Fence* b, uint64! c)*)    ((void*)(*((void**)(((int64!)gqlVtbl) + 14 * 8))));
+        Signal(ptr, _fence, _currentFenceValue);
+    }
+
     public ID3D12Fence* GetFence() {
         return _fence;
     }

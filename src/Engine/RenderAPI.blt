@@ -3,9 +3,15 @@ public class RenderAPI {
     private D12Device _device;
     private D12CommandQueue _commandQueue;
     private D12CommandList _commandList;
+    private DXGISwapChain _swapChain;
     private char* _deviceName;
+    private uint32! _width = 0;
+    private uint32! _height = 0;
 
-    public void Initialize(int64* hWnd) {
+    public void Initialize(int64* hWnd, uint32! width, uint32! height) {
+        _width = width;
+        _height = height;
+
         D12Debug.Get().Enable();
 
         var factory = new DXGIFactory();
@@ -46,11 +52,83 @@ public class RenderAPI {
 
         _commandList = new D12CommandList();
         _commandList.Initialize(_device.ptr);
+
+        _swapChain = new DXGISwapChain();
+        _swapChain.Initialize(_device.ptr, (IDXGIFactory2*)factory.ptr, _commandQueue.ptr, hWnd, _width, _height);
+    }
+
+    public void UpdateDraw() {
+        D3D12_RESOURCE_BARRIER barrier = new D3D12_RESOURCE_BARRIER();
+        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier.d0 = (uint64*)_swapChain.GetCurrentRenderTarget();
+        barrier.d1 = 0;
+        barrier.d2 = D3D12_RESOURCE_STATE_PRESENT;
+        barrier.d3 = D3D12_RESOURCE_STATE_RENDER_TARGET;
+
+        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = _swapChain.GetCurrentRTVHandle();
+        ID3D12GraphicsCommandList* gcl = _commandList.GFXCmd();
+
+        var gclVtbl = *(void***)gcl;
+
+        var ResourceBarrier =       (int32!(ID3D12GraphicsCommandList* a, uint32! b, D3D12_RESOURCE_BARRIER* c)*)    ((void*)(*((void**)(((int64!)gclVtbl) + 26 * 8))));
+        ResourceBarrier(gcl, 1, &barrier);
+
+        barrier = new D3D12_RESOURCE_BARRIER();
+        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+        barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        barrier.d0 = (uint64*)_swapChain.GetCurrentRenderTarget();
+        barrier.d1 = 0;
+        barrier.d2 = D3D12_RESOURCE_STATE_RENDER_TARGET;
+        barrier.d3 = D3D12_RESOURCE_STATE_PRESENT;
+
+        ResourceBarrier(gcl, 1, &barrier);
+
+        var color = new FLOAT_4();
+
+        var ClearRenderTargetView =       (int32!(ID3D12GraphicsCommandList* a, D3D12_CPU_DESCRIPTOR_HANDLE b, float32* c, uint32! d, RECT* e)*)    ((void*)(*((void**)(((int64!)gclVtbl) + 48 * 8))));
+        ClearRenderTargetView(gcl, rtvHandle, &color, 0, (RECT*)0);
+
+        var Close =                       (int32!(ID3D12GraphicsCommandList* a)*)                           ((void*)(*((void**)(((int64!)gclVtbl) + 9 * 8))));
+        Close(gcl);
+
+        _commandQueue.ExecuteCommandLists(_commandList.ptr);
+
+        _swapChain.Present();
+
+        var fence = _commandQueue.GetFence();
+        var fenceVtbl = *(void***)fence;
+        var GetCompletedValue =       (uint64!(ID3D12Fence* a)*)    ((void*)(*((void**)(((int64!)fenceVtbl) + 8 * 8))));
+
+        while (GetCompletedValue(fence) < _commandQueue.GetCurrentFenceValue()) { }
+
+        _commandList.ResetCommandList();
     }
 
     public void Destruct() {
         LowLevel.FreeCharPtrString(_deviceName);
     }
+
+    constexpr uint32! D3D12_RESOURCE_BARRIER_TYPE_TRANSITION = 0;
+    constexpr uint32! D3D12_RESOURCE_BARRIER_FLAG_NONE = 0;
+    constexpr uint32! D3D12_RESOURCE_STATE_PRESENT = 0;
+    constexpr uint32! D3D12_RESOURCE_STATE_RENDER_TARGET = 4;
+}
+
+public struct D3D12_RESOURCE_BARRIER {
+    public uint32! Type;
+    public uint32! Flags;
+    uint64* d0;
+    uint32! d1;
+    uint32! d2;
+    uint32! d3;
+}
+
+public struct FLOAT_4 {
+    public float32! d0;
+    public float32! d1;
+    public float32! d2;
+    public float32! d3;
 }
 
 public struct LUID {
