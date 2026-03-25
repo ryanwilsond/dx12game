@@ -22,7 +22,7 @@ public class RenderAPI {
             DXGI_ADAPTER_DESC desc = new DXGI_ADAPTER_DESC();
 
             var adapterVtbl = *(void***)adapter.ptr;
-            var GetDesc =                       (int32!(IDXGIAdapter* a, DXGI_ADAPTER_DESC* b)*)            ((void*)(*((void**)(((int64!)adapterVtbl) + 8 * 8))));
+            var GetDesc = (int32!(IDXGIAdapter* a, DXGI_ADAPTER_DESC* b)*)adapterVtbl[8];
             var d_hr = GetDesc(adapter.ptr, &desc);
 
             if (d_hr != 0) {
@@ -38,7 +38,7 @@ public class RenderAPI {
         _deviceName = LowLevel.CreateCharPtrString("Main Virtual Device");
 
         var deviceVtbl = *(void***)_device.ptr;
-        var SetName =                       (int32!(ID3D12Device* a, char* b)*)                         ((void*)(*((void**)(((int64!)deviceVtbl) + 6 * 8))));
+        var SetName = (int32!(ID3D12Device* a, char* b)*)deviceVtbl[6];
         var hr = SetName(_device.ptr, _deviceName);
 
         if (hr != 0) {
@@ -71,7 +71,7 @@ public class RenderAPI {
 
         var gclVtbl = *(void***)gcl;
 
-        var ResourceBarrier =       (int32!(ID3D12GraphicsCommandList* a, uint32! b, D3D12_RESOURCE_BARRIER* c)*)    ((void*)(*((void**)(((int64!)gclVtbl) + 26 * 8))));
+        var ResourceBarrier = (int32!(ID3D12GraphicsCommandList* a, uint32! b, D3D12_RESOURCE_BARRIER* c)*)gclVtbl[26];
         ResourceBarrier(gcl, 1, &barrier);
 
         barrier = new D3D12_RESOURCE_BARRIER();
@@ -85,11 +85,12 @@ public class RenderAPI {
         ResourceBarrier(gcl, 1, &barrier);
 
         var color = new FLOAT_4();
+        color.d3 = 1;
 
-        var ClearRenderTargetView =       (int32!(ID3D12GraphicsCommandList* a, D3D12_CPU_DESCRIPTOR_HANDLE b, float32* c, uint32! d, RECT* e)*)    ((void*)(*((void**)(((int64!)gclVtbl) + 48 * 8))));
+        var ClearRenderTargetView = (int32!(ID3D12GraphicsCommandList* a, D3D12_CPU_DESCRIPTOR_HANDLE b, float32* c, uint32! d, RECT* e)*)gclVtbl[48];
         ClearRenderTargetView(gcl, rtvHandle, &color, 0, (RECT*)0);
 
-        var Close =                       (int32!(ID3D12GraphicsCommandList* a)*)                           ((void*)(*((void**)(((int64!)gclVtbl) + 9 * 8))));
+        var Close = (int32!(ID3D12GraphicsCommandList* a)*)gclVtbl[9];
         Close(gcl);
 
         _commandQueue.ExecuteCommandLists(_commandList.ptr);
@@ -98,7 +99,7 @@ public class RenderAPI {
 
         var fence = _commandQueue.GetFence();
         var fenceVtbl = *(void***)fence;
-        var GetCompletedValue =       (uint64!(ID3D12Fence* a)*)    ((void*)(*((void**)(((int64!)fenceVtbl) + 8 * 8))));
+        var GetCompletedValue = (uint64!(ID3D12Fence* a)*)fenceVtbl[8];
 
         while (GetCompletedValue(fence) < _commandQueue.GetCurrentFenceValue()) { }
 

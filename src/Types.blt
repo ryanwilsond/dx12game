@@ -45,18 +45,6 @@ public struct RECT {
     public int32! bottom;
 }
 
-public struct PAINTSTRUCT {
-    public int64* hdc;
-    public bool! fErase;
-    public RECT rcPaint;
-    public bool! fRestore;
-    public bool! fIncUpdate;
-    uint64! res0;
-    uint64! res1;
-    uint64! res2;
-    uint64! res3;
-}
-
 public struct CREATESTRUCTA {
     public void* lpCreateParams;
     public int64* hInstance;
