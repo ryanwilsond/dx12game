@@ -8,10 +8,10 @@ public class DXGIDebug {
     public void GetLiveObjects() {
         GetInterface();
 
-        var DXGI_DEBUG_ALL = Helpers.MakeGUID(0xe48ae283, 0xda80, 0x490b, new int![]! { 0x87, 0xe6, 0x43, 0xe9, 0xa9, 0xcf, 0xda, 0x8 });
+        var DXGI_DEBUG_ALL = Helpers.MakeGUID(0xe48ae283, 0xda80, 0x490b, new int![] { 0x87, 0xe6, 0x43, 0xe9, 0xa9, 0xcf, 0xda, 0x8 });
 
         var debugVtbl = *(void***)ptr;
-        var ReportLiveObjects = (int32!(IDXGI2Debug* a, GUID b, int32! flags)*)debugVtbl[3];
+        var ReportLiveObjects = (int32!(IDXGI2Debug*, GUID, int32!)*)debugVtbl[3];
         var hr = ReportLiveObjects(ptr, DXGI_DEBUG_ALL, (int32!)(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
 
         if (hr != 0) {
@@ -29,7 +29,7 @@ public class DXGIDebug {
 
     private void GetInterface() {
         // __uuid(IDXGIDebug)
-        var debugGuid = Helpers.MakeGUID(0x119E7452, 0xDE9E, 0x40fe, new int![]! { 0x88, 0x06, 0x88, 0xF9, 0x0C, 0x12, 0xB4, 0x41 });
+        var debugGuid = Helpers.MakeGUID(0x119E7452, 0xDE9E, 0x40fe, new int![] { 0x88, 0x06, 0x88, 0xF9, 0x0C, 0x12, 0xB4, 0x41 });
 
         var hr = DXGIGetDebugInterface(&debugGuid, (void**)&ptr);
 

@@ -11,10 +11,10 @@ public class D12CommandQueue {
         desc.NodeMask = 0;
 
         // __uuid(ID3D12CommandQueue)
-        var cqGuid = Helpers.MakeGUID(0x0ec870a6, 0x5d7e, 0x4c22, new int![]! { 0x8c, 0xfc, 0x5b, 0xaa, 0xe0, 0x76, 0x16, 0xed });
+        var cqGuid = Helpers.MakeGUID(0x0ec870a6, 0x5d7e, 0x4c22, new int![] { 0x8c, 0xfc, 0x5b, 0xaa, 0xe0, 0x76, 0x16, 0xed });
 
         var deviceVtbl = *(void***)pDevice;
-        var CreateCommandQueue = (int32!(ID3D12Device* a, D3D12_COMMAND_QUEUE_DESC* b, GUID* c, void** d)*)deviceVtbl[8];
+        var CreateCommandQueue = (int32!(ID3D12Device*, D3D12_COMMAND_QUEUE_DESC*, GUID*, void**)*)deviceVtbl[8];
         var hr = CreateCommandQueue(pDevice, &desc, &cqGuid, (void**)&ptr);
 
         if (hr != 0) {
@@ -24,9 +24,9 @@ public class D12CommandQueue {
         }
 
         // __uuid(ID3D12Fence)
-        var fenceGuid = Helpers.MakeGUID(0x0a753dcf, 0xc4d8, 0x4b91, new int![]! { 0xad, 0xf6, 0xbe, 0x5a, 0x60, 0xd9, 0x5a, 0x76 });
+        var fenceGuid = Helpers.MakeGUID(0x0a753dcf, 0xc4d8, 0x4b91, new int![] { 0xad, 0xf6, 0xbe, 0x5a, 0x60, 0xd9, 0x5a, 0x76 });
 
-        var CreateFence = (int32!(ID3D12Device* a, uint64! b, uint32! c, GUID* d, void** e)*)deviceVtbl[36];
+        var CreateFence = (int32!(ID3D12Device*, uint64!, uint32!, GUID*, void**)*)deviceVtbl[36];
         hr = CreateFence(pDevice, 0, 0, &fenceGuid, (void**)&_fence);
 
         if (hr != 0) {
@@ -38,11 +38,11 @@ public class D12CommandQueue {
 
     public void ExecuteCommandLists(ID3D12CommandList* pCommandList) {
         var gqlVtbl = *(void***)ptr;
-        var ExecuteCommandLists = (int32!(ID3D12CommandQueue* a, uint32! b, void** c)*)gqlVtbl[10];
+        var ExecuteCommandLists = (int32!(ID3D12CommandQueue*, uint32!, void**)*)gqlVtbl[10];
         ExecuteCommandLists(ptr, 1, (void**)&pCommandList);
         _currentFenceValue = (uint64!)(_currentFenceValue + 1);
 
-        var Signal = (int32!(ID3D12CommandQueue* a, ID3D12Fence* b, uint64! c)*)gqlVtbl[14];
+        var Signal = (int32!(ID3D12CommandQueue*, ID3D12Fence*, uint64!)*)gqlVtbl[14];
         Signal(ptr, _fence, _currentFenceValue);
     }
 

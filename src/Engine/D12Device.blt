@@ -8,7 +8,7 @@ public class D12Device {
 
     public void Initialize(IDXGIAdapter* pAdapter) {
         // __uuid(ID3D12Device)
-        var deviceGuid = Helpers.MakeGUID(0x189819f1, 0x1db6, 0x4b57, new int![]! { 0xbe, 0x54, 0x18, 0x21, 0x33, 0x9b, 0x85, 0xf7 });
+        var deviceGuid = Helpers.MakeGUID(0x189819f1, 0x1db6, 0x4b57, new int![] { 0xbe, 0x54, 0x18, 0x21, 0x33, 0x9b, 0x85, 0xf7 });
 
         var hr = D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_12_2, &deviceGuid, (void**)&ptr);
 

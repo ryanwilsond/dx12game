@@ -7,7 +7,7 @@ public class D12Debug {
 
     public void Enable() {
         // __uuid(ID3D12Debug)
-        var debugGuid = Helpers.MakeGUID(0x344488b7, 0x6846, 0x474b, new int![]! { 0xb9, 0x89, 0xf0, 0x27, 0x44, 0x82, 0x45, 0xe0 });
+        var debugGuid = Helpers.MakeGUID(0x344488b7, 0x6846, 0x474b, new int![] { 0xb9, 0x89, 0xf0, 0x27, 0x44, 0x82, 0x45, 0xe0 });
 
         var hr = D3D12GetDebugInterface(&debugGuid, (void**)&ptr);
 
@@ -18,7 +18,7 @@ public class D12Debug {
         }
 
         var debugVtbl = *(void***)ptr;
-        var EnableDebugLayer = (int32!(ID3D12Debug* a)*)debugVtbl[3];
+        var EnableDebugLayer = (int32!(ID3D12Debug*)*)debugVtbl[3];
         hr = EnableDebugLayer(ptr);
 
         if (hr != 0) {

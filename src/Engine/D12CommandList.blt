@@ -4,10 +4,10 @@ public class D12CommandList {
 
     public void Initialize(ID3D12Device* pDevice) {
         // __uuid(ID3D12CommandAllocator)
-        var caGuid = Helpers.MakeGUID(0x6102dee4, 0xaf59, 0x4b09, new int![]! { 0xb9, 0x99, 0xb4, 0x4d, 0x73, 0xf0, 0x9b, 0x24 });
+        var caGuid = Helpers.MakeGUID(0x6102dee4, 0xaf59, 0x4b09, new int![] { 0xb9, 0x99, 0xb4, 0x4d, 0x73, 0xf0, 0x9b, 0x24 });
 
         var deviceVtbl = *(void***)pDevice;
-        var CreateCommandAllocator = (int32!(ID3D12Device* a, int32! b, GUID* c, void** d)*)deviceVtbl[9];
+        var CreateCommandAllocator = (int32!(ID3D12Device*, int32!, GUID*, void**)*)deviceVtbl[9];
         var hr = CreateCommandAllocator(pDevice, D3D12_COMMAND_LIST_TYPE_DIRECT, &caGuid, (void**)&_allocator);
 
         if (hr != 0) {
@@ -17,9 +17,9 @@ public class D12CommandList {
         }
 
         // __uuid(ID3D12CommandList)
-        var clGuid = Helpers.MakeGUID(0x7116d91c, 0xe7e4, 0x47ce, new int![]! { 0xb8, 0xc6, 0xec, 0x81, 0x68, 0xf4, 0x37, 0xe5 });
+        var clGuid = Helpers.MakeGUID(0x7116d91c, 0xe7e4, 0x47ce, new int![] { 0xb8, 0xc6, 0xec, 0x81, 0x68, 0xf4, 0x37, 0xe5 });
 
-        var CreateCommandList = (int32!(ID3D12Device* a, uint32! b, int32! c, ID3D12CommandAllocator* d, void* e, GUID* f, void** g)*)deviceVtbl[12];
+        var CreateCommandList = (int32!(ID3D12Device*, uint32!, int32!, ID3D12CommandAllocator*, void*, GUID*, void**)*)deviceVtbl[12];
         hr = CreateCommandList(pDevice, 0, D3D12_COMMAND_LIST_TYPE_DIRECT, _allocator, (void*)null, &clGuid, (void**)&ptr);
 
         if (hr != 0) {
@@ -31,13 +31,13 @@ public class D12CommandList {
 
     public void ResetCommandList() {
         var alVtbl = *(void***)_allocator;
-        var ResetAl =       (int32!(ID3D12CommandAllocator* a)*)    ((void*)(*((void**)(((int64!)alVtbl) + 8 * 8))));
+        var ResetAl = (int32!(ID3D12CommandAllocator*)*)alVtbl[8];
         ResetAl(_allocator);
 
         ID3D12GraphicsCommandList* gcl = GFXCmd();
 
         var gclVtbl = *(void***)gcl;
-        var ResetGcl = (int32!(ID3D12GraphicsCommandList* a, ID3D12CommandAllocator* b, void* c)*)gclVtbl[10];
+        var ResetGcl = (int32!(ID3D12GraphicsCommandList*, ID3D12CommandAllocator*, void*)*)gclVtbl[10];
         ResetGcl(gcl, _allocator, (void*)null);
     }
 
