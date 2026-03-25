@@ -9,8 +9,8 @@ public class DXGIFactory {
     }
 
     public DXGIAdapter GetAdapter() {
-        IDXGIFactory6* fac6 = (IDXGIFactory6*)null;
-        IDXGIAdapter* adapter = (IDXGIAdapter*)null;
+        IDXGIFactory6* fac6;
+        IDXGIAdapter* adapter;
 
         // __uuid(IDXGIFactory6)
         var fac6Guid = Helpers.MakeGUID(0xc1b6694f, 0xff09, 0x44a9, new int![]! { 0xb0, 0x3c, 0x77, 0x90, 0x0a, 0x0a, 0x1d, 0x17 });

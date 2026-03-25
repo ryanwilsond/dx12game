@@ -88,7 +88,7 @@ public class RenderAPI {
         color.d3 = 1;
 
         var ClearRenderTargetView = (int32!(ID3D12GraphicsCommandList* a, D3D12_CPU_DESCRIPTOR_HANDLE b, float32* c, uint32! d, RECT* e)*)gclVtbl[48];
-        ClearRenderTargetView(gcl, rtvHandle, &color, 0, (RECT*)0);
+        ClearRenderTargetView(gcl, rtvHandle, (float32*)&color, 0, nullptr);
 
         var Close = (int32!(ID3D12GraphicsCommandList* a)*)gclVtbl[9];
         Close(gcl);
