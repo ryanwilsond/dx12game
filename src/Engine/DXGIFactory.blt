@@ -16,7 +16,7 @@ public class DXGIFactory {
         var fac6Guid = Helpers.MakeGUID(0xc1b6694f, 0xff09, 0x44a9, new int![] { 0xb0, 0x3c, 0x77, 0x90, 0x0a, 0x0a, 0x1d, 0x17 });
 
         void** fac4Vtbl = *(void***)ptr;
-        var QueryInterface = (int32!(IDXGIFactory4*, GUID*, void**)*)fac4Vtbl[0];
+        var QueryInterface = (int32(IDXGIFactory4*, GUID*, void**)*)fac4Vtbl[0];
         var hr = QueryInterface(ptr, &fac6Guid, (void**)(&fac6));
 
         if (hr != 0) {
@@ -29,7 +29,7 @@ public class DXGIFactory {
         var adapterGuid = Helpers.MakeGUID(0x2411e7e1, 0x12ac, 0x4ccf, new int![] { 0xbd, 0x14, 0x97, 0x98, 0xe8, 0x53, 0x4d, 0xc0 });
 
         void** fac6Vtbl = *(void***)fac6;
-        var EnumAdapterByGpuPreference = (int32!(IDXGIFactory6*, uint32!, uint32!, GUID*, void**)*)fac4Vtbl[29];
+        var EnumAdapterByGpuPreference = (int32(IDXGIFactory6*, uint32, uint32, GUID*, void**)*)fac4Vtbl[29];
         hr = EnumAdapterByGpuPreference(fac6, 0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, &adapterGuid, (void**)(&adapter));
 
         if (hr != 0) {
@@ -43,12 +43,12 @@ public class DXGIFactory {
 
     public IDXGIFactory4* ptr;
 
-    constexpr uint32! DXGI_CREATE_FACTORY_DEBUG = 0x1;
+    constexpr uint32 DXGI_CREATE_FACTORY_DEBUG = 0x1;
 
-    constexpr uint32! DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE = 0x2;
+    constexpr uint32 DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE = 0x2;
 
     [DllImport("dxgi.dll")]
-    static extern int32! CreateDXGIFactory2(uint32! flags, GUID* riid, void** factory);
+    static extern int32 CreateDXGIFactory2(uint32 flags, GUID* riid, void** factory);
 }
 
 public struct IDXGIAdapter {

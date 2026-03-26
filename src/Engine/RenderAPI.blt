@@ -5,10 +5,10 @@ public class RenderAPI {
     private D12CommandList _commandList;
     private DXGISwapChain _swapChain;
     private char* _deviceName;
-    private uint32! _width = 0;
-    private uint32! _height = 0;
+    private uint32 _width = 0;
+    private uint32 _height = 0;
 
-    public void Initialize(int64* hWnd, uint32! width, uint32! height) {
+    public void Initialize(int64* hWnd, uint32 width, uint32 height) {
         _width = width;
         _height = height;
 
@@ -22,7 +22,7 @@ public class RenderAPI {
             DXGI_ADAPTER_DESC desc = new DXGI_ADAPTER_DESC();
 
             var adapterVtbl = *(void***)adapter.ptr;
-            var GetDesc = (int32!(IDXGIAdapter*, DXGI_ADAPTER_DESC*)*)adapterVtbl[8];
+            var GetDesc = (int32(IDXGIAdapter*, DXGI_ADAPTER_DESC*)*)adapterVtbl[8];
             var d_hr = GetDesc(adapter.ptr, &desc);
 
             if (d_hr != 0) {
@@ -38,7 +38,7 @@ public class RenderAPI {
         _deviceName = LowLevel.CreateCharPtrString("Main Virtual Device");
 
         var deviceVtbl = *(void***)_device.ptr;
-        var SetName = (int32!(ID3D12Device*, char*)*)deviceVtbl[6];
+        var SetName = (int32(ID3D12Device*, char*)*)deviceVtbl[6];
         var hr = SetName(_device.ptr, _deviceName);
 
         if (hr != 0) {
@@ -71,7 +71,7 @@ public class RenderAPI {
 
         var gclVtbl = *(void***)gcl;
 
-        var ResourceBarrier = (int32!(ID3D12GraphicsCommandList*, uint32!, D3D12_RESOURCE_BARRIER*)*)gclVtbl[26];
+        var ResourceBarrier = (int32(ID3D12GraphicsCommandList*, uint32, D3D12_RESOURCE_BARRIER*)*)gclVtbl[26];
         ResourceBarrier(gcl, 1, &barrier);
 
         barrier = new D3D12_RESOURCE_BARRIER();
@@ -87,10 +87,10 @@ public class RenderAPI {
         var color = new FLOAT_4();
         color.d3 = 1;
 
-        var ClearRenderTargetView = (int32!(ID3D12GraphicsCommandList*, D3D12_CPU_DESCRIPTOR_HANDLE, float32*, uint32!, RECT*)*)gclVtbl[48];
+        var ClearRenderTargetView = (int32(ID3D12GraphicsCommandList*, D3D12_CPU_DESCRIPTOR_HANDLE, float32*, uint32, RECT*)*)gclVtbl[48];
         ClearRenderTargetView(gcl, rtvHandle, (float32*)&color, 0, nullptr);
 
-        var Close = (int32!(ID3D12GraphicsCommandList*)*)gclVtbl[9];
+        var Close = (int32(ID3D12GraphicsCommandList*)*)gclVtbl[9];
         Close(gcl);
 
         _commandQueue.ExecuteCommandLists(_commandList.ptr);
@@ -99,7 +99,7 @@ public class RenderAPI {
 
         var fence = _commandQueue.GetFence();
         var fenceVtbl = *(void***)fence;
-        var GetCompletedValue = (uint64!(ID3D12Fence*)*)fenceVtbl[8];
+        var GetCompletedValue = (uint64(ID3D12Fence*)*)fenceVtbl[8];
 
         while (GetCompletedValue(fence) < _commandQueue.GetCurrentFenceValue()) { }
 
@@ -110,72 +110,72 @@ public class RenderAPI {
         LowLevel.FreeCharPtrString(_deviceName);
     }
 
-    constexpr uint32! D3D12_RESOURCE_BARRIER_TYPE_TRANSITION = 0;
-    constexpr uint32! D3D12_RESOURCE_BARRIER_FLAG_NONE = 0;
-    constexpr uint32! D3D12_RESOURCE_STATE_PRESENT = 0;
-    constexpr uint32! D3D12_RESOURCE_STATE_RENDER_TARGET = 4;
+    constexpr uint32 D3D12_RESOURCE_BARRIER_TYPE_TRANSITION = 0;
+    constexpr uint32 D3D12_RESOURCE_BARRIER_FLAG_NONE = 0;
+    constexpr uint32 D3D12_RESOURCE_STATE_PRESENT = 0;
+    constexpr uint32 D3D12_RESOURCE_STATE_RENDER_TARGET = 4;
 }
 
 public struct D3D12_RESOURCE_BARRIER {
-    public uint32! Type;
-    public uint32! Flags;
+    public uint32 Type;
+    public uint32 Flags;
     uint64* d0;
-    uint32! d1;
-    uint32! d2;
-    uint32! d3;
+    uint32 d1;
+    uint32 d2;
+    uint32 d3;
 }
 
 public struct FLOAT_4 {
-    public float32! d0;
-    public float32! d1;
-    public float32! d2;
-    public float32! d3;
+    public float32 d0;
+    public float32 d1;
+    public float32 d2;
+    public float32 d3;
 }
 
 public struct LUID {
-    public uint32! LowPart;
-    public int32! HighPart;
+    public uint32 LowPart;
+    public int32 HighPart;
 }
 
 public struct DXGI_ADAPTER_DESC {
-    uint64! d_0;
-    uint64! d_1;
-    uint64! d_2;
-    uint64! d_3;
-    uint64! d_4;
-    uint64! d_5;
-    uint64! d_6;
-    uint64! d_7;
-    uint64! d_8;
-    uint64! d_9;
-    uint64! d_10;
-    uint64! d_11;
-    uint64! d_12;
-    uint64! d_13;
-    uint64! d_14;
-    uint64! d_15;
-    uint64! d_16;
-    uint64! d_17;
-    uint64! d_18;
-    uint64! d_19;
-    uint64! d_20;
-    uint64! d_21;
-    uint64! d_22;
-    uint64! d_23;
-    uint64! d_24;
-    uint64! d_25;
-    uint64! d_26;
-    uint64! d_27;
-    uint64! d_28;
-    uint64! d_29;
-    uint64! d_30;
-    uint64! d_31;
-    public uint32! VendorId;
-    public uint32! DeviceId;
-    public uint32! SubSysId;
-    public uint32! Revision;
-    public int64! DedicatedVideoMemory;
-    public int64! DedicatedSystemMemory;
-    public int64! SharedSystemMemory;
+    uint64 d_0;
+    uint64 d_1;
+    uint64 d_2;
+    uint64 d_3;
+    uint64 d_4;
+    uint64 d_5;
+    uint64 d_6;
+    uint64 d_7;
+    uint64 d_8;
+    uint64 d_9;
+    uint64 d_10;
+    uint64 d_11;
+    uint64 d_12;
+    uint64 d_13;
+    uint64 d_14;
+    uint64 d_15;
+    uint64 d_16;
+    uint64 d_17;
+    uint64 d_18;
+    uint64 d_19;
+    uint64 d_20;
+    uint64 d_21;
+    uint64 d_22;
+    uint64 d_23;
+    uint64 d_24;
+    uint64 d_25;
+    uint64 d_26;
+    uint64 d_27;
+    uint64 d_28;
+    uint64 d_29;
+    uint64 d_30;
+    uint64 d_31;
+    public uint32 VendorId;
+    public uint32 DeviceId;
+    public uint32 SubSysId;
+    public uint32 Revision;
+    public int64 DedicatedVideoMemory;
+    public int64 DedicatedSystemMemory;
+    public int64 SharedSystemMemory;
     public LUID AdapterLuid;
 }

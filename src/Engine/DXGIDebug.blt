@@ -11,8 +11,8 @@ public class DXGIDebug {
         var DXGI_DEBUG_ALL = Helpers.MakeGUID(0xe48ae283, 0xda80, 0x490b, new int![] { 0x87, 0xe6, 0x43, 0xe9, 0xa9, 0xcf, 0xda, 0x8 });
 
         var debugVtbl = *(void***)ptr;
-        var ReportLiveObjects = (int32!(IDXGI2Debug*, GUID, int32!)*)debugVtbl[3];
-        var hr = ReportLiveObjects(ptr, DXGI_DEBUG_ALL, (int32!)(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
+        var ReportLiveObjects = (int32(IDXGI2Debug*, GUID, int32)*)debugVtbl[3];
+        var hr = ReportLiveObjects(ptr, DXGI_DEBUG_ALL, (int32)(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
 
         if (hr != 0) {
             Console.Print("ReportLiveObjects failed: ");
@@ -42,11 +42,11 @@ public class DXGIDebug {
 
     public static DXGIDebug Instance = new DXGIDebug();
 
-    constexpr int32! DXGI_DEBUG_RLO_DETAIL = 0x2;
-    constexpr int32! DXGI_DEBUG_RLO_IGNORE_INTERNAL = 0x4;
+    constexpr int32 DXGI_DEBUG_RLO_DETAIL = 0x2;
+    constexpr int32 DXGI_DEBUG_RLO_IGNORE_INTERNAL = 0x4;
 
     [DllImport("dxgidebug.dll")]
-    static extern int32! DXGIGetDebugInterface(GUID* riid, void** debug);
+    static extern int32 DXGIGetDebugInterface(GUID* riid, void** debug);
 }
 
 public struct IDXGI2Debug {

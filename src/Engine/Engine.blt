@@ -6,13 +6,13 @@ public class Engine {
     private char* _lpszClassName;
     private RenderAPI _renderer;
     private void* _gcPtr;
-    private uint32! _width = 1280;
-    private uint32! _height = 720;
+    private uint32 _width = 1280;
+    private uint32 _height = 720;
 
     public bool! Initialize() {
         var hInstance = GetModuleHandle(null);
         var wc = new WNDCLASSEX();
-        wc.cbSize = (uint32!)LowLevel.SizeOf<WNDCLASSEX>();
+        wc.cbSize = (uint32)LowLevel.SizeOf<WNDCLASSEX>();
         wc.lpfnWndProc = &WndProcImpl;
         wc.hInstance = hInstance;
         wc.hbrBackground = (int64*)COLOR_WINDOW;
@@ -38,18 +38,18 @@ public class Engine {
             0,
             wc.lpszClassName,
             _windowName,
-            (uint32!)(WS_OVERLAPPEDWINDOW | WS_VISIBLE),
+            (uint32)(WS_OVERLAPPEDWINDOW | WS_VISIBLE),
             CW_USEDEFAULT,
             CW_USEDEFAULT,
-            (int32!)_width,
-            (int32!)_height,
+            (int32)_width,
+            (int32)_height,
             nullptr,
             nullptr,
             hInstance,
             (int64*)_gcPtr
         );
 
-        if (((int64!)_hWnd) == 0) {
+        if (((int64)_hWnd) == 0) {
             Console.PrintLine("CreateWindowEx failed");
             return false;
         }
@@ -92,7 +92,7 @@ public class Engine {
         return _isRunning;
     }
 
-    static int64* WndProcImpl(int64* hWnd, uint32! msg, int64* wParam, int64* lParam) {
+    static int64* WndProcImpl(int64* hWnd, uint32 msg, int64* wParam, int64* lParam) {
         if (msg == WM_NCCREATE) {
             var param = (CREATESTRUCTA*)lParam;
             var ptr = (void*)param->lpCreateParams;
@@ -112,43 +112,43 @@ public class Engine {
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }
 
-    private static uint32! RGB(uint8! r, uint8! g, uint8! b) {
-        return (uint32!)(r | (g << 8) | (b << 16));
+    private static uint32 RGB(uint8 r, uint8 g, uint8 b) {
+        return (uint32)(r | (g << 8) | (b << 16));
     }
 
-    constexpr int32! SW_SHOW = 5;
+    constexpr int32 SW_SHOW = 5;
 
-    constexpr uint32! WS_OVERLAPPEDWINDOW = 0x00CF0000;
-    constexpr uint32! WS_VISIBLE = 0x10000000;
+    constexpr uint32 WS_OVERLAPPEDWINDOW = 0x00CF0000;
+    constexpr uint32 WS_VISIBLE = 0x10000000;
 
-    constexpr int32! CW_USEDEFAULT = (int32!)0x80000000;
+    constexpr int32 CW_USEDEFAULT = (int32)0x80000000;
 
-    constexpr uint32! WM_DESTROY = 0x0002;
-    constexpr uint32! WM_NCCREATE = 0x0081;
-    constexpr uint32! WM_CREATE = 0x0001;
+    constexpr uint32 WM_DESTROY = 0x0002;
+    constexpr uint32 WM_NCCREATE = 0x0081;
+    constexpr uint32 WM_CREATE = 0x0001;
 
-    constexpr uint32! COLOR_WINDOW = 5;
+    constexpr uint32 COLOR_WINDOW = 5;
 
-    constexpr uint32! IDC_ARROW = 32512;
-    constexpr uint32! IDI_APPLICATION = 32512;
+    constexpr uint32 IDC_ARROW = 32512;
+    constexpr uint32 IDI_APPLICATION = 32512;
 
-    constexpr uint32! PM_REMOVE = 0x0001;
+    constexpr uint32 PM_REMOVE = 0x0001;
 
-    constexpr int32! GWLP_USERDATA = (int32!)(-21);
+    constexpr int32 GWLP_USERDATA = (int32)(-21);
 
     [DllImport("user32.dll")]
-    static extern uint16! RegisterClassEx(WNDCLASSEX* lpwcx);
+    static extern uint16 RegisterClassEx(WNDCLASSEX* lpwcx);
 
     [DllImport("user32.dll")]
     static extern int64* CreateWindowEx(
-        uint32! dwExStyle,
+        uint32 dwExStyle,
         char* lpClassName,
         char* lpWindowName,
-        uint32! dwStyle,
-        int32! x,
-        int32! y,
-        int32! nWidth,
-        int32! nHeight,
+        uint32 dwStyle,
+        int32 x,
+        int32 y,
+        int32 nWidth,
+        int32 nHeight,
         int64* hWndParent,
         int64* hMenu,
         int64* hInstance,
@@ -158,22 +158,22 @@ public class Engine {
     static extern int64* GetModuleHandle(string lpModuleName);
 
     [DllImport("user32.dll")]
-    static extern void PostQuitMessage(int32! nExitCode);
+    static extern void PostQuitMessage(int32 nExitCode);
 
     [DllImport("user32.dll")]
-    static extern int64* DefWindowProc(int64* hWnd, uint32! msg, int64* wParam, int64* lParam);
+    static extern int64* DefWindowProc(int64* hWnd, uint32 msg, int64* wParam, int64* lParam);
 
     [DllImport("user32.dll")]
-    static extern bool! ShowWindow(int64* hWnd, int32! nCmdShow);
+    static extern bool! ShowWindow(int64* hWnd, int32 nCmdShow);
 
     [DllImport("user32.dll")]
     static extern bool! UpdateWindow(int64* hWnd);
 
     [DllImport("user32.dll")]
-    static extern int8! GetMessage(MSG* lpMsg, int64* hWnd, uint32! min, uint32! max);
+    static extern int8 GetMessage(MSG* lpMsg, int64* hWnd, uint32 min, uint32 max);
 
     [DllImport("user32.dll")]
-    static extern int8! PeekMessage(MSG* lpMsg, int64* hWnd, uint32! min, uint32! max, uint32! wRemoveMsg);
+    static extern int8 PeekMessage(MSG* lpMsg, int64* hWnd, uint32 min, uint32 max, uint32 wRemoveMsg);
 
     [DllImport("user32.dll")]
     static extern bool! TranslateMessage(MSG* lpMsg);
@@ -188,8 +188,8 @@ public class Engine {
     static extern int64* LoadIcon(int64* hInstance, char* lpIconName);
 
     [DllImport("user32.dll")]
-    static extern int64* SetWindowLongPtr(int64* hWnd, int32! index, int64* dwNewLong);
+    static extern int64* SetWindowLongPtr(int64* hWnd, int32 index, int64* dwNewLong);
 
     [DllImport("user32.dll")]
-    static extern int64* GetWindowLongPtr(int64* hWnd, int32! index);
+    static extern int64* GetWindowLongPtr(int64* hWnd, int32 index);
 }

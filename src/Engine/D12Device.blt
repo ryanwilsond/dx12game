@@ -21,11 +21,11 @@ public class D12Device {
 
     public ID3D12Device* ptr;
 
-    constexpr int32! D3D_FEATURE_LEVEL_1_0_CORE = 0x1000;
-    constexpr int32! D3D_FEATURE_LEVEL_12_2 = 0xc200;
+    constexpr int32 D3D_FEATURE_LEVEL_1_0_CORE = 0x1000;
+    constexpr int32 D3D_FEATURE_LEVEL_12_2 = 0xc200;
 
     [DllImport("d3d12.dll")]
-    static extern int32! D3D12CreateDevice(void* adapter, int32! featureLevel, GUID* riid, void** device);
+    static extern int32 D3D12CreateDevice(void* adapter, int32 featureLevel, GUID* riid, void** device);
 }
 
 public struct ID3D12Device {

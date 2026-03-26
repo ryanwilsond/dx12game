@@ -3,17 +3,17 @@ public static class Helpers {
     public static GUID MakeGUID(int! data1, int! data2, int! data3, int![]! data4) {
         var guid = new GUID();
 
-        guid.data1 = (uint32!)data1;
-        guid.data2 = (uint16!)data2;
-        guid.data3 = (uint16!)data3;
-        guid.data4_0 = (uint8!)data4[0];
-        guid.data4_1 = (uint8!)data4[1];
-        guid.data4_2 = (uint8!)data4[2];
-        guid.data4_3 = (uint8!)data4[3];
-        guid.data4_4 = (uint8!)data4[4];
-        guid.data4_5 = (uint8!)data4[5];
-        guid.data4_6 = (uint8!)data4[6];
-        guid.data4_7 = (uint8!)data4[7];
+        guid.data1 = (uint32)data1;
+        guid.data2 = (uint16)data2;
+        guid.data3 = (uint16)data3;
+        guid.data4_0 = (uint8)data4[0];
+        guid.data4_1 = (uint8)data4[1];
+        guid.data4_2 = (uint8)data4[2];
+        guid.data4_3 = (uint8)data4[3];
+        guid.data4_4 = (uint8)data4[4];
+        guid.data4_5 = (uint8)data4[5];
+        guid.data4_6 = (uint8)data4[6];
+        guid.data4_7 = (uint8)data4[7];
 
         return guid;
     }

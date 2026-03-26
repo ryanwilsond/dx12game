@@ -1,7 +1,7 @@
 
 public class D12CommandQueue {
     private ID3D12Fence* _fence;
-    private uint64! _currentFenceValue = 0;
+    private uint64 _currentFenceValue = 0;
 
     public void Initialize(ID3D12Device* pDevice) {
         D3D12_COMMAND_QUEUE_DESC desc = new D3D12_COMMAND_QUEUE_DESC();
@@ -14,7 +14,7 @@ public class D12CommandQueue {
         var cqGuid = Helpers.MakeGUID(0x0ec870a6, 0x5d7e, 0x4c22, new int![] { 0x8c, 0xfc, 0x5b, 0xaa, 0xe0, 0x76, 0x16, 0xed });
 
         var deviceVtbl = *(void***)pDevice;
-        var CreateCommandQueue = (int32!(ID3D12Device*, D3D12_COMMAND_QUEUE_DESC*, GUID*, void**)*)deviceVtbl[8];
+        var CreateCommandQueue = (int32(ID3D12Device*, D3D12_COMMAND_QUEUE_DESC*, GUID*, void**)*)deviceVtbl[8];
         var hr = CreateCommandQueue(pDevice, &desc, &cqGuid, (void**)&ptr);
 
         if (hr != 0) {
@@ -26,7 +26,7 @@ public class D12CommandQueue {
         // __uuid(ID3D12Fence)
         var fenceGuid = Helpers.MakeGUID(0x0a753dcf, 0xc4d8, 0x4b91, new int![] { 0xad, 0xf6, 0xbe, 0x5a, 0x60, 0xd9, 0x5a, 0x76 });
 
-        var CreateFence = (int32!(ID3D12Device*, uint64!, uint32!, GUID*, void**)*)deviceVtbl[36];
+        var CreateFence = (int32(ID3D12Device*, uint64, uint32, GUID*, void**)*)deviceVtbl[36];
         hr = CreateFence(pDevice, 0, 0, &fenceGuid, (void**)&_fence);
 
         if (hr != 0) {
@@ -38,11 +38,11 @@ public class D12CommandQueue {
 
     public void ExecuteCommandLists(ID3D12CommandList* pCommandList) {
         var gqlVtbl = *(void***)ptr;
-        var ExecuteCommandLists = (int32!(ID3D12CommandQueue*, uint32!, void**)*)gqlVtbl[10];
+        var ExecuteCommandLists = (int32(ID3D12CommandQueue*, uint32, void**)*)gqlVtbl[10];
         ExecuteCommandLists(ptr, 1, (void**)&pCommandList);
-        _currentFenceValue = (uint64!)(_currentFenceValue + 1);
+        _currentFenceValue = (uint64)(_currentFenceValue + 1);
 
-        var Signal = (int32!(ID3D12CommandQueue*, ID3D12Fence*, uint64!)*)gqlVtbl[14];
+        var Signal = (int32(ID3D12CommandQueue*, ID3D12Fence*, uint64)*)gqlVtbl[14];
         Signal(ptr, _fence, _currentFenceValue);
     }
 
@@ -50,15 +50,15 @@ public class D12CommandQueue {
         return _fence;
     }
 
-    public uint64! GetCurrentFenceValue() {
+    public uint64 GetCurrentFenceValue() {
         return _currentFenceValue;
     }
 
     public ID3D12CommandQueue* ptr;
 
-    constexpr int32! D3D12_COMMAND_LIST_TYPE_DIRECT = 0;
-    constexpr int32! D3D12_COMMAND_QUEUE_PRIORITY_HIGH = 100;
-    constexpr uint32! D3D12_COMMAND_QUEUE_FLAG_NONE = 0;
+    constexpr int32 D3D12_COMMAND_LIST_TYPE_DIRECT = 0;
+    constexpr int32 D3D12_COMMAND_QUEUE_PRIORITY_HIGH = 100;
+    constexpr uint32 D3D12_COMMAND_QUEUE_FLAG_NONE = 0;
 }
 
 public struct ID3D12Fence {
@@ -70,8 +70,8 @@ public struct ID3D12CommandQueue {
 }
 
 public struct D3D12_COMMAND_QUEUE_DESC {
-    public int32! Type;
-    public int32! Priority;
-    public uint32! Flags;
-    public uint32! NodeMask;
+    public int32 Type;
+    public int32 Priority;
+    public uint32 Flags;
+    public uint32 NodeMask;
 }

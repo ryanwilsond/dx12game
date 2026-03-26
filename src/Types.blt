@@ -1,10 +1,10 @@
 
 public struct WNDCLASSEX {
-    public uint32! cbSize;
-    public uint32! style;
-    public int64*(int64*, uint32!, int64*, int64*)* lpfnWndProc;
-    public int32! cbClsExtra;
-    public int32! cbWndExtra;
+    public uint32 cbSize;
+    public uint32 style;
+    public int64*(int64*, uint32, int64*, int64*)* lpfnWndProc;
+    public int32 cbClsExtra;
+    public int32 cbWndExtra;
     public int64* hInstance;
     public int64* hIcon;
     public int64* hCursor;
@@ -16,33 +16,33 @@ public struct WNDCLASSEX {
 
 public struct MSG {
     public int64* hWnd;
-    public uint32! message;
+    public uint32 message;
     public int64* wParam;
     public int64* lParam;
-    public uint32! time;
-    public int32! pt_x;
-    public int32! pt_y;
+    public uint32 time;
+    public int32 pt_x;
+    public int32 pt_y;
 }
 
 public struct GUID {
-    public uint32! data1;
-    public uint16! data2;
-    public uint16! data3;
-    public uint8! data4_0;
-    public uint8! data4_1;
-    public uint8! data4_2;
-    public uint8! data4_3;
-    public uint8! data4_4;
-    public uint8! data4_5;
-    public uint8! data4_6;
-    public uint8! data4_7;
+    public uint32 data1;
+    public uint16 data2;
+    public uint16 data3;
+    public uint8 data4_0;
+    public uint8 data4_1;
+    public uint8 data4_2;
+    public uint8 data4_3;
+    public uint8 data4_4;
+    public uint8 data4_5;
+    public uint8 data4_6;
+    public uint8 data4_7;
 }
 
 public struct RECT {
-    public int32! left;
-    public int32! top;
-    public int32! right;
-    public int32! bottom;
+    public int32 left;
+    public int32 top;
+    public int32 right;
+    public int32 bottom;
 }
 
 public struct CREATESTRUCTA {
@@ -50,12 +50,12 @@ public struct CREATESTRUCTA {
     public int64* hInstance;
     public int64* hMenu;
     public int64* hwndParent;
-    public int32! cy;
-    public int32! cx;
-    public int32! y;
-    public int32! x;
-    public int32! style;
+    public int32 cy;
+    public int32 cx;
+    public int32 y;
+    public int32 x;
+    public int32 style;
     public char* lpszName;
     public char* lpszClass;
-    public uint32! dwExStyle;
+    public uint32 dwExStyle;
 }
