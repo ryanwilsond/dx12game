@@ -11,7 +11,7 @@ public class DXGIDebug {
         var DXGI_DEBUG_ALL = Helpers.MakeGUID(0xe48ae283, 0xda80, 0x490b, new int![] { 0x87, 0xe6, 0x43, 0xe9, 0xa9, 0xcf, 0xda, 0x8 });
 
         var debugVtbl = *(void***)ptr;
-        var ReportLiveObjects = (int32(IDXGI2Debug*, GUID, int32)*)debugVtbl[3];
+        var ReportLiveObjects = (int32(IDXGI2Debug*, GUID, int32)*~)debugVtbl[3];
         var hr = ReportLiveObjects(ptr, DXGI_DEBUG_ALL, (int32)(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
 
         if (hr != 0) {

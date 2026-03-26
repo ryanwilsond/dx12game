@@ -18,7 +18,7 @@ public class D12Debug {
         }
 
         var debugVtbl = *(void***)ptr;
-        var EnableDebugLayer = (int32(ID3D12Debug*)*)debugVtbl[3];
+        var EnableDebugLayer = (int32(ID3D12Debug*)*~)debugVtbl[3];
         hr = EnableDebugLayer(ptr);
 
         if (hr != 0) {

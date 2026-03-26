@@ -22,7 +22,7 @@ public class RenderAPI {
             DXGI_ADAPTER_DESC desc = new DXGI_ADAPTER_DESC();
 
             var adapterVtbl = *(void***)adapter.ptr;
-            var GetDesc = (int32(IDXGIAdapter*, DXGI_ADAPTER_DESC*)*)adapterVtbl[8];
+            var GetDesc = (int32(IDXGIAdapter*, DXGI_ADAPTER_DESC*)*~)adapterVtbl[8];
             var d_hr = GetDesc(adapter.ptr, &desc);
 
             if (d_hr != 0) {
@@ -38,7 +38,7 @@ public class RenderAPI {
         _deviceName = LowLevel.CreateCharPtrString("Main Virtual Device");
 
         var deviceVtbl = *(void***)_device.ptr;
-        var SetName = (int32(ID3D12Device*, char*)*)deviceVtbl[6];
+        var SetName = (int32(ID3D12Device*, char*)*~)deviceVtbl[6];
         var hr = SetName(_device.ptr, _deviceName);
 
         if (hr != 0) {
@@ -71,7 +71,7 @@ public class RenderAPI {
 
         var gclVtbl = *(void***)gcl;
 
-        var ResourceBarrier = (int32(ID3D12GraphicsCommandList*, uint32, D3D12_RESOURCE_BARRIER*)*)gclVtbl[26];
+        var ResourceBarrier = (int32(ID3D12GraphicsCommandList*, uint32, D3D12_RESOURCE_BARRIER*)*~)gclVtbl[26];
         ResourceBarrier(gcl, 1, &barrier);
 
         barrier = new D3D12_RESOURCE_BARRIER();
@@ -87,10 +87,10 @@ public class RenderAPI {
         var color = new FLOAT_4();
         color.d3 = 1;
 
-        var ClearRenderTargetView = (int32(ID3D12GraphicsCommandList*, D3D12_CPU_DESCRIPTOR_HANDLE, float32*, uint32, RECT*)*)gclVtbl[48];
+        var ClearRenderTargetView = (int32(ID3D12GraphicsCommandList*, D3D12_CPU_DESCRIPTOR_HANDLE, float32*, uint32, RECT*)*~)gclVtbl[48];
         ClearRenderTargetView(gcl, rtvHandle, (float32*)&color, 0, nullptr);
 
-        var Close = (int32(ID3D12GraphicsCommandList*)*)gclVtbl[9];
+        var Close = (int32(ID3D12GraphicsCommandList*)*~)gclVtbl[9];
         Close(gcl);
 
         _commandQueue.ExecuteCommandLists(_commandList.ptr);
@@ -99,7 +99,7 @@ public class RenderAPI {
 
         var fence = _commandQueue.GetFence();
         var fenceVtbl = *(void***)fence;
-        var GetCompletedValue = (uint64(ID3D12Fence*)*)fenceVtbl[8];
+        var GetCompletedValue = (uint64(ID3D12Fence*)*~)fenceVtbl[8];
 
         while (GetCompletedValue(fence) < _commandQueue.GetCurrentFenceValue()) { }
 
