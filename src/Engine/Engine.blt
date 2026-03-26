@@ -2,8 +2,8 @@
 public class Engine {
     private bool! _isRunning = false;
     private int64* _hWnd;
-    private char* _windowName;
-    private char* _lpszClassName;
+    private uint8* _windowName;
+    private uint8* _lpszClassName;
     private RenderAPI _renderer;
     private void* _gcPtr;
     private uint32 _width = 1280;
@@ -12,7 +12,7 @@ public class Engine {
     public bool! Initialize() {
         var hInstance = GetModuleHandle(null);
         var wc = new WNDCLASSEX();
-        wc.cbSize = (uint32)LowLevel.SizeOf<WNDCLASSEX>();
+        wc.cbSize = (uint32)sizeof(WNDCLASSEX);
         wc.lpfnWndProc = &WndProcImpl;
         wc.hInstance = hInstance;
         wc.hbrBackground = (int64*)COLOR_WINDOW;
@@ -23,9 +23,9 @@ public class Engine {
         wc.cbClsExtra = 0;
         wc.cbWndExtra = 0;
 
-        _lpszClassName = LowLevel.CreateCharPtrString("ExampleWindowClass");
+        _lpszClassName = LowLevel.CreateLPCSTR("ExampleWindowClass");
         wc.lpszClassName = _lpszClassName;
-        _windowName = LowLevel.CreateCharPtrString("Example Window");
+        _windowName = LowLevel.CreateLPCSTR("Example Window");
 
         if (RegisterClassEx(&wc) == 0) {
             Console.PrintLine("RegisterClassEx failed");
@@ -72,8 +72,8 @@ public class Engine {
         DXGIDebug.Get().GetLiveObjects();
         _isRunning = false;
         _renderer.Destruct();
-        LowLevel.FreeCharPtrString(_lpszClassName);
-        LowLevel.FreeCharPtrString(_windowName);
+        LowLevel.FreeLPCSTR(_lpszClassName);
+        LowLevel.FreeLPCSTR(_windowName);
         LowLevel.FreeGCHandle(_gcPtr);
     }
 
@@ -142,8 +142,8 @@ public class Engine {
     [DllImport("user32.dll")]
     static extern int64* CreateWindowEx(
         uint32 dwExStyle,
-        char* lpClassName,
-        char* lpWindowName,
+        uint8* lpClassName,
+        uint8* lpWindowName,
         uint32 dwStyle,
         int32 x,
         int32 y,

@@ -9,8 +9,8 @@ public struct WNDCLASSEX {
     public int64* hIcon;
     public int64* hCursor;
     public int64* hbrBackground;
-    public char* lpszMenuName;
-    public char* lpszClassName;
+    public uint8* lpszMenuName;
+    public uint8* lpszClassName;
     public int64* hIconSm;
 }
 
@@ -55,7 +55,7 @@ public struct CREATESTRUCTA {
     public int32 y;
     public int32 x;
     public int32 style;
-    public char* lpszName;
-    public char* lpszClass;
+    public uint8* lpszName;
+    public uint8* lpszClass;
     public uint32 dwExStyle;
 }

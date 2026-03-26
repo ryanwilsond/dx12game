@@ -29,13 +29,13 @@ public class RenderAPI {
                 Console.Print("GetDesc failed: ");
                 Console.PrintLine(d_hr);
             } else {
-                string gpu = LowLevel.ReadLPCSTR((void*)&desc);
+                string gpu = LowLevel.ReadLPCWSTR((char*)&desc);
                 Console.PrintLine("Selected device: " + gpu);
             }
         }
 
         _device = new D12Device(adapter.ptr);
-        _deviceName = LowLevel.CreateCharPtrString("Main Virtual Device");
+        _deviceName = LowLevel.CreateLPCWSTR("Main Virtual Device");
 
         var deviceVtbl = *(void***)_device.ptr;
         var SetName = (int32(ID3D12Device*, char*)*~)deviceVtbl[6];
@@ -107,7 +107,7 @@ public class RenderAPI {
     }
 
     public void Destruct() {
-        LowLevel.FreeCharPtrString(_deviceName);
+        LowLevel.FreeLPCWSTR(_deviceName);
     }
 
     constexpr uint32 D3D12_RESOURCE_BARRIER_TYPE_TRANSITION = 0;
@@ -138,38 +138,7 @@ public struct LUID {
 }
 
 public struct DXGI_ADAPTER_DESC {
-    uint64 d_0;
-    uint64 d_1;
-    uint64 d_2;
-    uint64 d_3;
-    uint64 d_4;
-    uint64 d_5;
-    uint64 d_6;
-    uint64 d_7;
-    uint64 d_8;
-    uint64 d_9;
-    uint64 d_10;
-    uint64 d_11;
-    uint64 d_12;
-    uint64 d_13;
-    uint64 d_14;
-    uint64 d_15;
-    uint64 d_16;
-    uint64 d_17;
-    uint64 d_18;
-    uint64 d_19;
-    uint64 d_20;
-    uint64 d_21;
-    uint64 d_22;
-    uint64 d_23;
-    uint64 d_24;
-    uint64 d_25;
-    uint64 d_26;
-    uint64 d_27;
-    uint64 d_28;
-    uint64 d_29;
-    uint64 d_30;
-    uint64 d_31;
+    public char! Desc[128];
     public uint32 VendorId;
     public uint32 DeviceId;
     public uint32 SubSysId;
