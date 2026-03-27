@@ -139,6 +139,10 @@ public struct ID3D12RootSignature {
     public void** lpVtbl;
 }
 
+public struct ID3D12PipelineState {
+    public void** lpVtbl;
+}
+
 public struct DXGI_SAMPLE_DESC {
     public uint32 Count;
     public uint32 Quality;
@@ -260,4 +264,143 @@ public struct D3D12_ROOT_SIGNATURE_DESC {
 public struct D3D12_VERSIONED_ROOT_SIGNATURE_DESC {
     public uint32 Version;
     public D3D12_ROOT_SIGNATURE_DESC Desc_1_0;
+}
+
+public struct D3D12_SHADER_BYTECODE {
+    public void* pShaderBytecode;
+    public uint64 BytecodeLength;
+}
+
+public struct D3D12_SO_DECLARATION_ENTRY {
+    public uint32 Stream;
+    public uint8* SemanticName;
+    public uint32 SemanticIndex;
+    public uint8 StartComponent;
+    public uint8 ComponentCount;
+    public uint8 OutputSlot;
+}
+
+public struct D3D12_STREAM_OUTPUT_DESC {
+    public D3D12_SO_DECLARATION_ENTRY* pSODeclaration;
+    public uint32 NumEntries;
+    public uint32* pBufferStrides;
+    public uint32 NumStrides;
+    public uint32 RasterizedStream;
+}
+
+public struct D3D12_RENDER_TARGET_BLEND_DESC {
+    public int32 BlendEnable;
+    public int32 LogicOpEnable;
+    public uint32 SrcBlend;
+    public uint32 DestBlend;
+    public uint32 BlendOp;
+    public uint32 SrcBlendAlpha;
+    public uint32 DestBlendAlpha;
+    public uint32 BlendOpAlpha;
+    public uint32 LogicOp;
+    public uint8 RenderTargetWriteMask;
+}
+
+public struct D3D12_BLEND_DESC {
+    public int32 AlphaToCoverageEnable;
+    public int32 IndependentBlendEnable;
+    public D3D12_RENDER_TARGET_BLEND_DESC RenderTarget_0;
+    public D3D12_RENDER_TARGET_BLEND_DESC RenderTarget_1;
+    public D3D12_RENDER_TARGET_BLEND_DESC RenderTarget_2;
+    public D3D12_RENDER_TARGET_BLEND_DESC RenderTarget_3;
+    public D3D12_RENDER_TARGET_BLEND_DESC RenderTarget_4;
+    public D3D12_RENDER_TARGET_BLEND_DESC RenderTarget_5;
+    public D3D12_RENDER_TARGET_BLEND_DESC RenderTarget_6;
+    public D3D12_RENDER_TARGET_BLEND_DESC RenderTarget_7;
+}
+
+public struct D3D12_RASTERIZER_DESC {
+    public uint32 FillMode;
+    public uint32 CullMode;
+    public int32 FrontCounterClockwise;
+    public int32 DepthBias;
+    public float32 DepthBiasClamp;
+    public float32 SlopeScaledDepthBias;
+    public int32 DepthClipEnable;
+    public int32 MultisampleEnable;
+    public int32 AntialiasedLineEnable;
+    public uint32 ForcedSampleCount;
+    public uint32 ConservativeRaster;
+}
+
+public struct D3D12_DEPTH_STENCILOP_DESC {
+    public uint32 StencilFailOp;
+    public uint32 StencilDepthFailOp;
+    public uint32 StencilPassOp;
+    public uint32 StencilFunc;
+}
+
+public struct D3D12_DEPTH_STENCIL_DESC {
+    public int32 DepthEnable;
+    public uint32 DepthWriteMask;
+    public uint32 DepthFunc;
+    public int32 StencilEnable;
+    public uint8 StencilReadMask;
+    public uint8 StencilWriteMask;
+    public D3D12_DEPTH_STENCILOP_DESC FrontFace;
+    public D3D12_DEPTH_STENCILOP_DESC BackFace;
+}
+
+public struct D3D12_INPUT_ELEMENT_DESC {
+    public uint8* SemanticName;
+    public uint32 SemanticIndex;
+    public uint32 Format;
+    public uint32 InputSlot;
+    public uint32 AlignedByteOffset;
+    public uint32 InputSlotClass;
+    public uint32 InstanceDataStepRate;
+}
+
+public struct D3D12_INPUT_LAYOUT_DESC {
+    public D3D12_INPUT_ELEMENT_DESC* pInputElementDescs;
+    public uint32 NumElements;
+}
+
+public struct D3D12_CACHED_PIPELINE_STATE {
+    public void* pCachedBlob;
+    public uint64 CachedBlobSizeInBytes;
+}
+
+public struct D3D12_GRAPHICS_PIPELINE_STATE_DESC {
+    public ID3D12RootSignature* pRootSignature;
+    public D3D12_SHADER_BYTECODE VS;
+    public D3D12_SHADER_BYTECODE PS;
+    public D3D12_SHADER_BYTECODE DS;
+    public D3D12_SHADER_BYTECODE HS;
+    public D3D12_SHADER_BYTECODE GS;
+    public D3D12_STREAM_OUTPUT_DESC StreamOutput;
+    public D3D12_BLEND_DESC BlendState;
+    public uint32 SampleMask;
+    public D3D12_RASTERIZER_DESC RasterizerState;
+    public D3D12_DEPTH_STENCIL_DESC DepthStencilState;
+    public D3D12_INPUT_LAYOUT_DESC InputLayout;
+    public uint32 IBStripCutValue;
+    public uint32 PrimitiveTopologyType;
+    public uint32 NumRenderTargets;
+    public uint32 RTVFormats[8];
+    public uint32 DSVFormat;
+    public DXGI_SAMPLE_DESC SampleDesc;
+    public uint32 NodeMask;
+    public D3D12_CACHED_PIPELINE_STATE CachedPSO;
+    public uint32 Flags;
+}
+
+public struct D3D12_VERTEX_BUFFER_VIEW {
+    public uint64 BufferLocation;
+    public uint32 SizeInBytes;
+    public uint32 StrideInBytes;
+}
+
+public struct D3D12_VIEWPORT {
+    public float32 TopLeftX;
+    public float32 TopLeftY;
+    public float32 Width;
+    public float32 Height;
+    public float32 MinDepth;
+    public float32 MaxDepth;
 }

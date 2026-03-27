@@ -58,7 +58,9 @@ public class HLSLShader {
         }
     }
 
-
+    public ID3D10Blob* GetByteCode() {
+        return _byteCode;
+    }
 
     public constexpr uint32 SHADER_TYPE_VERTEX = 0;
     public constexpr uint32 SHADER_TYPE_PIXEL = 1;

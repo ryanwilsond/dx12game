@@ -1,4 +1,145 @@
 
 public class D12PipelineState {
+    private D12RootSignature _rootSignature;
+    private HLSLShader[] _shaders;
 
+    public void Initialize(ID3D12Device* pDevice) {
+        _rootSignature = new D12RootSignature();
+        _rootSignature.Initialize(pDevice);
+        _shaders = new HLSLShader[] { new HLSLShader(), new HLSLShader() };
+        _shaders[0].Initialize("shaders/VS.hlsl", HLSLShader.SHADER_TYPE_VERTEX);
+        _shaders[1].Initialize("shaders/PS.hlsl", HLSLShader.SHADER_TYPE_PIXEL);
+
+        D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = new D3D12_GRAPHICS_PIPELINE_STATE_DESC();
+        desc.pRootSignature = _rootSignature.ptr;
+
+        var VSByteCode = _shaders[0].GetByteCode();
+        var PSByteCode = _shaders[1].GetByteCode();
+
+        var blobVtbl = *(void***)VSByteCode;
+        var GetBufferPointer = (void*(ID3D10Blob*)*~)blobVtbl[3];
+        var GetBufferSize = (uint64(ID3D10Blob*)*~)blobVtbl[4];
+
+        desc.VS.pShaderBytecode = GetBufferPointer(VSByteCode);
+        desc.VS.BytecodeLength = GetBufferSize(VSByteCode);
+        desc.PS.pShaderBytecode = GetBufferPointer(PSByteCode);
+        desc.PS.BytecodeLength = GetBufferSize(PSByteCode);
+
+        desc.BlendState = new D3D12_BLEND_DESC();
+        desc.BlendState.AlphaToCoverageEnable = 0;
+        desc.BlendState.IndependentBlendEnable = 0;
+        desc.BlendState.RenderTarget_0 = new D3D12_RENDER_TARGET_BLEND_DESC();
+        desc.BlendState.RenderTarget_0.BlendEnable = 0;
+        desc.BlendState.RenderTarget_0.LogicOpEnable = 0;
+        desc.BlendState.RenderTarget_0.RenderTargetWriteMask = (uint8)D3D12_COLOR_WRITE_ENABLE_ALL;
+
+        desc.SampleMask = 0xFFFFFFFF;
+        desc.SampleDesc = new DXGI_SAMPLE_DESC();
+        desc.SampleDesc.Count = 1;
+        desc.SampleDesc.Quality = 0;
+
+        desc.RasterizerState = new D3D12_RASTERIZER_DESC();
+        desc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+        desc.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
+        desc.RasterizerState.FrontCounterClockwise = 1;
+        desc.RasterizerState.DepthClipEnable = 1;
+        desc.RasterizerState.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+
+        desc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        desc.DepthStencilState = new D3D12_DEPTH_STENCIL_DESC();
+        desc.DepthStencilState.DepthEnable = 1;
+        desc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+        desc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+
+        var semanticNamePos = LowLevel.CreateLPCSTR("POSITION");
+        // var semanticNameCol = LowLevel.CreateLPCSTR("NORMAL");
+        var semanticNameCol = LowLevel.CreateLPCSTR("COLOR");
+
+        D3D12_INPUT_ELEMENT_DESC element1 = new D3D12_INPUT_ELEMENT_DESC();
+        element1.SemanticName = semanticNamePos;
+        element1.SemanticIndex = 0;
+        element1.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        element1.InputSlot = 0;
+        element1.AlignedByteOffset = 0;
+        element1.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+        element1.InstanceDataStepRate = 0;
+
+        D3D12_INPUT_ELEMENT_DESC element2 = new D3D12_INPUT_ELEMENT_DESC();
+        element2.SemanticName = semanticNameCol;
+        element2.SemanticIndex = 0;
+        element2.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+        element2.InputSlot = 0;
+        element2.AlignedByteOffset = 12;
+        element2.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+        element2.InstanceDataStepRate = 0;
+
+        // D3D12_INPUT_ELEMENT_DESC element2 = new D3D12_INPUT_ELEMENT_DESC();
+        // element2.SemanticName = semanticNameCol;
+        // element2.SemanticIndex = 0;
+        // element2.Format = DXGI_FORMAT_R32G32B32_FLOAT;
+        // element2.InputSlot = 0;
+        // element2.AlignedByteOffset = 12;
+        // element2.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
+        // element2.InstanceDataStepRate = 0;
+
+        var elements = new InputElementDesc2();
+        elements.element1 = element1;
+        elements.element2 = element2;
+
+        D3D12_INPUT_LAYOUT_DESC inputLayout = new D3D12_INPUT_LAYOUT_DESC();
+        inputLayout.NumElements = 2;
+        inputLayout.pInputElementDescs = (D3D12_INPUT_ELEMENT_DESC*)&elements;
+
+        desc.InputLayout = inputLayout;
+        desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+        desc.NumRenderTargets = 1;
+        desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+        desc.NodeMask = 0;
+        desc.Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+
+        // __uuid(ID3D12PipelineState)
+        var plGuid = Helpers.MakeGUID(0x765a30f3, 0xf624, 0x4c6f, new int![] { 0xa8, 0x28, 0xac, 0xe9, 0x48, 0x62, 0x24, 0x45 });
+
+        var deviceVtbl = *(void***)pDevice;
+        var CreateGraphicsPipelineState = (int32(ID3D12Device*, D3D12_GRAPHICS_PIPELINE_STATE_DESC*, GUID*, void**)*~)deviceVtbl[10];
+        var hr = CreateGraphicsPipelineState(pDevice, &desc, &plGuid, (void**)&ptr);
+
+        if (hr != 0) {
+            Console.Print("CreateGraphicsPipelineState failed: ");
+            Console.PrintLine(hr);
+        }
+
+        LowLevel.FreeLPCSTR(semanticNamePos);
+        LowLevel.FreeLPCSTR(semanticNameCol);
+    }
+
+    public ID3D12RootSignature* GetRootSignature() {
+        return _rootSignature.ptr;
+    }
+
+    public ID3D12PipelineState* ptr;
+
+    constexpr uint32 D3D12_FILL_MODE_SOLID = 3;
+    constexpr uint32 D3D12_CULL_MODE_FRONT = 2;
+    constexpr uint32 D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF = 0;
+    constexpr uint32 D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE = 3;
+    constexpr uint32 DXGI_FORMAT_R16G16B16A16_FLOAT = 10;
+    constexpr uint32 D3D12_PIPELINE_STATE_FLAG_NONE = 0;
+    constexpr uint32 DXGI_FORMAT_R32G32B32_FLOAT = 6;
+    constexpr uint32 D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA = 0;
+    constexpr uint32 DXGI_FORMAT_R32G32B32A32_FLOAT = 2;
+    constexpr uint32 D3D12_COLOR_WRITE_ENABLE_RED = 0x1;
+    constexpr uint32 D3D12_COLOR_WRITE_ENABLE_GREEN = 0x2;
+    constexpr uint32 D3D12_COLOR_WRITE_ENABLE_BLUE = 0x4;
+    constexpr uint32 D3D12_COLOR_WRITE_ENABLE_ALPHA = 0x8;
+    constexpr uint32 D3D12_COLOR_WRITE_ENABLE_ALL = (uint32)(((D3D12_COLOR_WRITE_ENABLE_RED | D3D12_COLOR_WRITE_ENABLE_GREEN) | D3D12_COLOR_WRITE_ENABLE_BLUE) | D3D12_COLOR_WRITE_ENABLE_ALPHA);
+    constexpr uint32 DXGI_FORMAT_D24_UNORM_S8_UINT = 45;
+    constexpr uint32 D3D12_COMPARISON_FUNC_LESS = 2;
+    constexpr uint32 D3D12_DEPTH_WRITE_MASK_ALL = 1;
+}
+
+public struct InputElementDesc2 {
+    public D3D12_INPUT_ELEMENT_DESC element1;
+    public D3D12_INPUT_ELEMENT_DESC element2;
 }
