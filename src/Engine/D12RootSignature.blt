@@ -1,0 +1,71 @@
+
+public class D12RootSignature {
+
+    public void Initialize(ID3D12Device* pDevice) {
+        D3D12_ROOT_PARAMETER rootParameter = new D3D12_ROOT_PARAMETER();
+        rootParameter.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
+        rootParameter.Descriptor = new D3D12_ROOT_DESCRIPTOR1();
+        rootParameter.Descriptor.ShaderRegister = 0;
+        rootParameter.Descriptor.RegisterSpace = 0;
+        rootParameter.ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
+
+        D3D12_VERSIONED_ROOT_SIGNATURE_DESC rsDesc = new D3D12_VERSIONED_ROOT_SIGNATURE_DESC();
+        rsDesc.Version = D3D_ROOT_SIGNATURE_VERSION_1_0;
+        rsDesc.Desc_1_0.pParameters = &rootParameter;
+        rsDesc.Desc_1_0.NumParameters = 1;
+        rsDesc.Desc_1_0.NumStaticSamplers = 0;
+        rsDesc.Desc_1_0.pStaticSamplers = nullptr;
+        rsDesc.Desc_1_0.Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
+
+        ID3D10Blob* pSerializedRS;
+        ID3D10Blob* pErrorBlob;
+
+        var hr = D3D12SerializeVersionedRootSignature(&rsDesc, &pSerializedRS, &pErrorBlob);
+
+        if (hr != 0) {
+            Console.Print("D3D12SerializeVersionedRootSignature failed: ");
+            Console.PrintLine(hr);
+        }
+
+        if (((uint64)pErrorBlob) != 0) {
+            var blobVtblErr = *(void***)pErrorBlob;
+            var GetBufferPointerErr = (void*(ID3D10Blob*)*~)blobVtblErr[3];
+            var lpvoid = GetBufferPointerErr(pErrorBlob);
+
+            var strMsgs = LowLevel.ReadLPCSTR((uint8*)lpvoid);
+            Console.Print("D3D12SerializeVersionedRootSignature erred: ");
+            Console.PrintLine(strMsgs);
+            return;
+        }
+
+        var blobVtbl = *(void***)pSerializedRS;
+        var GetBufferPointer = (void*(ID3D10Blob*)*~)blobVtbl[3];
+        var GetBufferSize = (uint64(ID3D10Blob*)*~)blobVtbl[4];
+
+        var pSRSP = GetBufferPointer(pSerializedRS);
+        var pSRSS = GetBufferSize(pSerializedRS);
+
+        // __uuid(ID3D12RootSignature)
+        var rootGuid = Helpers.MakeGUID(0xc54a6b66, 0x72df, 0x4ee8, new int![] { 0x8b, 0xe5, 0xa9, 0x46, 0xa1, 0x42, 0x92, 0x14 });
+
+        var deviceVtbl = *(void***)pDevice;
+        var CreateRootSignature = (int32(ID3D12Device*, uint32, void*, uint64, GUID*, void**)*~)deviceVtbl[16];
+        hr = CreateRootSignature(pDevice, 0, pSRSP, pSRSS, &rootGuid, (void**)&ptr);
+
+        if (hr != 0) {
+            Console.Print("CreateRootSignature failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
+    }
+
+    public ID3D12RootSignature* ptr;
+
+    constexpr uint32 D3D12_ROOT_PARAMETER_TYPE_CBV = 2;
+    constexpr uint32 D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT = 1;
+    constexpr uint32 D3D_ROOT_SIGNATURE_VERSION_1_0 = 1;
+    constexpr uint32 D3D12_SHADER_VISIBILITY_VERTEX = 1;
+
+    [DllImport("d3d12.dll")]
+    static extern int32 D3D12SerializeVersionedRootSignature(D3D12_VERSIONED_ROOT_SIGNATURE_DESC* root_signature_desc, ID3D10Blob** blob, ID3D10Blob** error_blob);
+}

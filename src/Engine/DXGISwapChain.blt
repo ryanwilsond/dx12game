@@ -32,7 +32,7 @@ public class DXGISwapChain {
 
         var factoryVtbl = *(void***)pFactory;
         var CreateSwapChainForHwnd = (int32(IDXGIFactory2*, ID3D12CommandQueue*, int64*, DXGI_SWAP_CHAIN_DESC1*, void*, void*, void**)*~)factoryVtbl[15];
-        var hr = CreateSwapChainForHwnd(pFactory, pQueue, hWnd, &desc, (void*)null, (void*)null, (void**)&ptr);
+        var hr = CreateSwapChainForHwnd(pFactory, pQueue, hWnd, &desc, nullptr, nullptr, (void**)&ptr);
 
         if (hr != 0) {
             Console.Print("CreateSwapChainForHwnd failed: ");
@@ -103,10 +103,10 @@ public class DXGISwapChain {
         // desc.ViewDimension = 0;
 
         // cpuHandle.ptr = (uint64*)(((uint64)cpuHandle.ptr) + (uint64)(_heapIncrement));
-        CreateRenderTargetView(_device, _renderTarget1, (void*)null, cpuHandle);
+        CreateRenderTargetView(_device, _renderTarget1, nullptr, cpuHandle);
 
         cpuHandle.ptr = (uint64*)(((uint64)cpuHandle.ptr) + (uint64)(_heapIncrement));
-        CreateRenderTargetView(_device, _renderTarget2, (void*)null, cpuHandle);
+        CreateRenderTargetView(_device, _renderTarget2, nullptr, cpuHandle);
     }
 
     public void Present() {
@@ -151,53 +151,4 @@ public class DXGISwapChain {
     constexpr uint32 DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH = 2;
     constexpr uint32 D3D12_DESCRIPTOR_HEAP_TYPE_RTV = 2;
     constexpr uint32 D3D12_DESCRIPTOR_HEAP_FLAG_NONE = 0;
-}
-
-public struct D3D12_CPU_DESCRIPTOR_HANDLE {
-    public uint64* ptr;
-}
-
-public struct IDXGISwapChain1 {
-    public void** lpVtbl;
-}
-
-public struct ID3D12Resource {
-    public void** lpVtbl;
-}
-
-public struct ID3D12DescriptorHeap {
-    public void** lpVtbl;
-}
-
-public struct DXGI_SAMPLE_DESC {
-    public uint32 Count;
-    public uint32 Quality;
-}
-
-public struct DXGI_SWAP_CHAIN_DESC1 {
-    public uint32 Width;
-    public uint32 Height;
-    public uint32 Format;
-    public bool! Stereo;
-    public DXGI_SAMPLE_DESC SampleDesc;
-    public uint32 BufferUsage;
-    public uint32 BufferCount;
-    public uint32 Scaling;
-    public uint32 SwapEffect;
-    public uint32 AlphaMode;
-    public uint32 Flags;
-}
-
-public struct D3D12_DESCRIPTOR_HEAP_DESC {
-    public uint32 Type;
-    public uint32 NumDescriptors;
-    public uint32 Flags;
-    public uint32 NodeMask;
-}
-
-public struct D3D12_RENDER_TARGET_VIEW_DESC {
-    public uint32 Format;
-    public uint32 ViewDimension;
-    uint64 d0;
-    uint64 d1;
 }

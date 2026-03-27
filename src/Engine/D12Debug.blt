@@ -35,7 +35,3 @@ public class D12Debug {
     [DllImport("d3d12.dll")]
     static extern int32 D3D12GetDebugInterface(GUID* riid, void** debug);
 }
-
-public struct ID3D12Debug {
-    void** lpVtbl;
-}

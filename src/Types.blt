@@ -59,3 +59,205 @@ public struct CREATESTRUCTA {
     public uint8* lpszClass;
     public uint32 dwExStyle;
 }
+
+public struct ID3D12GraphicsCommandList {
+    public void** lpVtbl;
+}
+
+public struct ID3D12CommandAllocator {
+    public void** lpVtbl;
+}
+
+public struct ID3D12CommandList {
+    public void** lpVtbl;
+}
+
+public struct ID3D12Fence {
+    public void** lpVtbl;
+}
+
+public struct ID3D12CommandQueue {
+    public void** lpVtbl;
+}
+
+public struct D3D12_COMMAND_QUEUE_DESC {
+    public int32 Type;
+    public int32 Priority;
+    public uint32 Flags;
+    public uint32 NodeMask;
+}
+
+public struct ID3D12Debug {
+    void** lpVtbl;
+}
+
+public struct ID3D12Device {
+    public void** lpVtbl;
+}
+
+public struct IDXGI2Debug {
+    void** lpVtbl;
+}
+
+public struct IDXGIAdapter {
+
+}
+
+public struct IDXGIFactory2 {
+    public void** lpVtbl;
+}
+
+public struct IDXGIFactory4 {
+    public void** lpVtbl;
+}
+
+public struct IDXGIFactory6 {
+    public void** lpVtbl;
+}
+
+public struct D3D12_CPU_DESCRIPTOR_HANDLE {
+    public uint64* ptr;
+}
+
+public struct IDXGISwapChain1 {
+    public void** lpVtbl;
+}
+
+public struct ID3D12Resource {
+    public void** lpVtbl;
+}
+
+public struct ID3D12DescriptorHeap {
+    public void** lpVtbl;
+}
+
+public struct ID3D10Blob {
+    public void** lpVtbl;
+}
+
+public struct ID3D12RootSignature {
+    public void** lpVtbl;
+}
+
+public struct DXGI_SAMPLE_DESC {
+    public uint32 Count;
+    public uint32 Quality;
+}
+
+public struct DXGI_SWAP_CHAIN_DESC1 {
+    public uint32 Width;
+    public uint32 Height;
+    public uint32 Format;
+    public bool! Stereo;
+    public DXGI_SAMPLE_DESC SampleDesc;
+    public uint32 BufferUsage;
+    public uint32 BufferCount;
+    public uint32 Scaling;
+    public uint32 SwapEffect;
+    public uint32 AlphaMode;
+    public uint32 Flags;
+}
+
+public struct D3D12_DESCRIPTOR_HEAP_DESC {
+    public uint32 Type;
+    public uint32 NumDescriptors;
+    public uint32 Flags;
+    public uint32 NodeMask;
+}
+
+public struct D3D12_RENDER_TARGET_VIEW_DESC {
+    public uint32 Format;
+    public uint32 ViewDimension;
+    uint64 d0;
+    uint64 d1;
+}
+
+public struct D3D12_RESOURCE_BARRIER {
+    public uint32 Type;
+    public uint32 Flags;
+    uint64* d0;
+    uint32 d1;
+    uint32 d2;
+    uint32 d3;
+}
+
+public struct LUID {
+    public uint32 LowPart;
+    public int32 HighPart;
+}
+
+public struct DXGI_ADAPTER_DESC {
+    public char! Desc[128];
+    public uint32 VendorId;
+    public uint32 DeviceId;
+    public uint32 SubSysId;
+    public uint32 Revision;
+    public int64 DedicatedVideoMemory;
+    public int64 DedicatedSystemMemory;
+    public int64 SharedSystemMemory;
+    public LUID AdapterLuid;
+}
+
+public struct D3D12_HEAP_PROPERTIES {
+    public uint32 Type;
+    public uint32 CPUPageProperty;
+    public uint32 MemoryPoolPreference;
+    public uint32 CreationNodeMask;
+    public uint32 VisibleNodeMask;
+}
+
+public struct D3D12_RESOURCE_DESC {
+    public uint32 Dimension;
+    public uint64 Alignment;
+    public uint64 Width;
+    public uint32 Height;
+    public uint16 DepthOrArraySize;
+    public uint16 MipLevels;
+    public uint32 Format;
+    public DXGI_SAMPLE_DESC SampleDesc;
+    public uint32 Layout;
+    public uint32 Flags;
+}
+
+public struct XMFLOAT3 {
+    public float32 x;
+    public float32 y;
+    public float32 z;
+}
+
+public struct XMFLOAT4 {
+    public float32 x;
+    public float32 y;
+    public float32 z;
+    public float32 w;
+}
+
+public struct Vertex {
+    public XMFLOAT3 position;
+    public XMFLOAT4 color;
+}
+
+public struct D3D12_ROOT_DESCRIPTOR1 {
+    public uint32 ShaderRegister;
+    public uint32 RegisterSpace;
+    public uint32 Flags;
+}
+
+public struct D3D12_ROOT_PARAMETER {
+    public uint32 ParameterType;
+    public D3D12_ROOT_DESCRIPTOR1 Descriptor;
+    public uint32 ShaderVisibility;
+}
+
+public struct D3D12_ROOT_SIGNATURE_DESC {
+    public uint32 NumParameters;
+    public D3D12_ROOT_PARAMETER* pParameters;
+    public uint32 NumStaticSamplers;
+    public void* pStaticSamplers;
+    public uint32 Flags;
+}
+
+public struct D3D12_VERSIONED_ROOT_SIGNATURE_DESC {
+    public uint32 Version;
+    public D3D12_ROOT_SIGNATURE_DESC Desc_1_0;
+}

@@ -50,19 +50,3 @@ public class DXGIFactory {
     [DllImport("dxgi.dll")]
     static extern int32 CreateDXGIFactory2(uint32 flags, GUID* riid, void** factory);
 }
-
-public struct IDXGIAdapter {
-
-}
-
-public struct IDXGIFactory2 {
-    public void** lpVtbl;
-}
-
-public struct IDXGIFactory4 {
-    public void** lpVtbl;
-}
-
-public struct IDXGIFactory6 {
-    public void** lpVtbl;
-}

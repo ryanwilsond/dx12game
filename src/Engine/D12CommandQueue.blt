@@ -60,18 +60,3 @@ public class D12CommandQueue {
     constexpr int32 D3D12_COMMAND_QUEUE_PRIORITY_HIGH = 100;
     constexpr uint32 D3D12_COMMAND_QUEUE_FLAG_NONE = 0;
 }
-
-public struct ID3D12Fence {
-    public void** lpVtbl;
-}
-
-public struct ID3D12CommandQueue {
-    public void** lpVtbl;
-}
-
-public struct D3D12_COMMAND_QUEUE_DESC {
-    public int32 Type;
-    public int32 Priority;
-    public uint32 Flags;
-    public uint32 NodeMask;
-}

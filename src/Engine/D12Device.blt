@@ -27,7 +27,3 @@ public class D12Device {
     [DllImport("d3d12.dll")]
     static extern int32 D3D12CreateDevice(void* adapter, int32 featureLevel, GUID* riid, void** device);
 }
-
-public struct ID3D12Device {
-    public void** lpVtbl;
-}

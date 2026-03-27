@@ -48,7 +48,3 @@ public class DXGIDebug {
     [DllImport("dxgidebug.dll")]
     static extern int32 DXGIGetDebugInterface(GUID* riid, void** debug);
 }
-
-public struct IDXGI2Debug {
-    void** lpVtbl;
-}
