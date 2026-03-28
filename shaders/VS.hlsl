@@ -11,10 +11,17 @@ struct VS_OUTPUT
     float4 color : COLOR;
 };
 
+struct PassData
+{
+    float4x4 viewProjection;
+};
+
+ConstantBuffer<PassData> gPassData : register(b0);
+
 VS_OUTPUT main(VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.position = float4(input.position, 1.0f);
+    output.position = mul(gPassData.viewProjection, float4(input.position, 1.0f));
     output.color = input.color;
 
     return output;

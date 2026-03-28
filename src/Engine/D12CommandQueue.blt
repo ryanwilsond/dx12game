@@ -4,11 +4,11 @@ public class D12CommandQueue {
     private uint64 _currentFenceValue = 0;
 
     public void Initialize(ID3D12Device* pDevice) {
-        D3D12_COMMAND_QUEUE_DESC desc = new D3D12_COMMAND_QUEUE_DESC();
-        desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-        desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
-        desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-        desc.NodeMask = 0;
+        D3D12_COMMAND_QUEUE_DESC desc = new D3D12_COMMAND_QUEUE_DESC()
+            ..Type = D3D12_COMMAND_LIST_TYPE_DIRECT
+            ..Priority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH
+            ..Flags = D3D12_COMMAND_QUEUE_FLAG_NONE
+            ..NodeMask = 0;
 
         // __uuid(ID3D12CommandQueue)
         var cqGuid = Helpers.MakeGUID(0x0ec870a6, 0x5d7e, 0x4c22, new int![] { 0x8c, 0xfc, 0x5b, 0xaa, 0xe0, 0x76, 0x16, 0xed });

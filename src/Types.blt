@@ -404,3 +404,18 @@ public struct D3D12_VIEWPORT {
     public float32 MinDepth;
     public float32 MaxDepth;
 }
+
+public struct XMVECTOR {
+    public float32 e[4];
+}
+
+public struct XMMATRIX {
+    public XMVECTOR r0;
+    public XMVECTOR r1;
+    public XMVECTOR r2;
+    public XMVECTOR r3;
+}
+
+public struct PassData {
+    public XMMATRIX viewProjection;
+}

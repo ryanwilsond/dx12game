@@ -1,36 +1,60 @@
 
 public static class Helpers {
     public static GUID MakeGUID(int! data1, int! data2, int! data3, int![]! data4) {
-        var guid = new GUID();
-
-        guid.data1 = (uint32)data1;
-        guid.data2 = (uint16)data2;
-        guid.data3 = (uint16)data3;
-        guid.data4_0 = (uint8)data4[0];
-        guid.data4_1 = (uint8)data4[1];
-        guid.data4_2 = (uint8)data4[2];
-        guid.data4_3 = (uint8)data4[3];
-        guid.data4_4 = (uint8)data4[4];
-        guid.data4_5 = (uint8)data4[5];
-        guid.data4_6 = (uint8)data4[6];
-        guid.data4_7 = (uint8)data4[7];
+        var guid = new GUID()
+            ..data1 = (uint32)data1
+            ..data2 = (uint16)data2
+            ..data3 = (uint16)data3
+            ..data4_0 = (uint8)data4[0]
+            ..data4_1 = (uint8)data4[1]
+            ..data4_2 = (uint8)data4[2]
+            ..data4_3 = (uint8)data4[3]
+            ..data4_4 = (uint8)data4[4]
+            ..data4_5 = (uint8)data4[5]
+            ..data4_6 = (uint8)data4[6]
+            ..data4_7 = (uint8)data4[7];
 
         return guid;
     }
 
     public static Vertex MakeVertex(float32 x, float32 y, float32 z, float32 r, float32 g, float32 b, float32 a) {
-        var vertex = new Vertex();
-        vertex.position.x = x;
-        vertex.position.y = y;
-        vertex.position.z = z;
-        vertex.color.x = r;
-        vertex.color.y = g;
-        vertex.color.z = b;
-        vertex.color.w = a;
+        var vertex = new Vertex()
+            ..position = (new XMFLOAT3()
+                ..x = x
+                ..y = y
+                ..z = z)
+            ..color = (new XMFLOAT4()
+                ..x = r
+                ..y = g
+                ..z = b
+                ..w = a);
         return vertex;
     }
 
     public static uint32 KBs(uint32 kb) {
         return (uint32)(kb * 1024);
+    }
+
+    public static uint32 CalculateConstantBufferAlignment(int32 allocation) {
+        return (uint32)(((uint32)allocation + 255) & ~255);
+    }
+
+    public static void PrintMatrix(XMMATRIX matrix) {
+        Console.Print("[ ");
+        PrintVector(matrix.r0);
+        Console.PrintLine(" ]");
+        Console.Print("[ ");
+        PrintVector(matrix.r1);
+        Console.PrintLine(" ]");
+        Console.Print("[ ");
+        PrintVector(matrix.r2);
+        Console.PrintLine(" ]");
+        Console.Print("[ ");
+        PrintVector(matrix.r3);
+        Console.PrintLine(" ]");
+
+        void PrintVector(XMVECTOR vector) {
+            Console.Print(((string)vector.e[0]) + " " + ((string)vector.e[1]) + " " + ((string)vector.e[2]) + " " + ((string)vector.e[3]));
+        }
     }
 }

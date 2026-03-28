@@ -11,20 +11,20 @@ public class DXGISwapChain {
     private uint32 _heapIncrement = 0;
 
     public void Initialize(ID3D12Device* pDevice, IDXGIFactory2* pFactory, ID3D12CommandQueue* pQueue, int64* hWnd, uint32 width, uint32 height) {
-        DXGI_SWAP_CHAIN_DESC1 desc = new DXGI_SWAP_CHAIN_DESC1();
-        desc.Width = width;
-        desc.Height = height;
-        desc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
-        desc.Stereo = false;
-        desc.SampleDesc = new DXGI_SAMPLE_DESC();
-        desc.SampleDesc.Count = 1;
-        desc.SampleDesc.Quality = 0;
-        desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        desc.BufferCount = 2;
-        desc.Scaling = DXGI_SCALING_NONE;
-        desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-        desc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
-        desc.Flags = (uint32)(DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+        DXGI_SWAP_CHAIN_DESC1 desc = new DXGI_SWAP_CHAIN_DESC1()
+            ..Width = width
+            ..Height = height
+            ..Format = DXGI_FORMAT_R16G16B16A16_FLOAT
+            ..Stereo = false
+            ..SampleDesc = (new DXGI_SAMPLE_DESC()
+                ..Count = 1
+                ..Quality = 0)
+            ..BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT
+            ..BufferCount = 2
+            ..Scaling = DXGI_SCALING_NONE
+            ..SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD
+            ..AlphaMode = DXGI_ALPHA_MODE_IGNORE
+            ..Flags = (uint32)(DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
         _width = width;
         _height = height;
@@ -43,11 +43,11 @@ public class DXGISwapChain {
         // __uuid(ID3D12DescriptorHeap)
         var heapGuid = Helpers.MakeGUID(0x8efb471d, 0x616c, 0x4f49, new int![] { 0x90, 0xf7, 0x12, 0x7b, 0xb7, 0x63, 0xfa, 0x51 });
 
-        D3D12_DESCRIPTOR_HEAP_DESC heapDesc = new D3D12_DESCRIPTOR_HEAP_DESC();
-        heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-        heapDesc.NumDescriptors = 2;
-        heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-        heapDesc.NodeMask = 0;
+        D3D12_DESCRIPTOR_HEAP_DESC heapDesc = new D3D12_DESCRIPTOR_HEAP_DESC()
+            ..Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV
+            ..NumDescriptors = 2
+            ..Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE
+            ..NodeMask = 0;
 
         var deviceVtbl = *(void***)pDevice;
         var CreateDescriptorHeap = (int32(ID3D12Device*, D3D12_DESCRIPTOR_HEAP_DESC*, GUID*, void**)*~)deviceVtbl[14];

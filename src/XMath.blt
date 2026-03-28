@@ -1,0 +1,277 @@
+
+public static class XMath {
+    public static XMVECTOR g_XMSelect1110;
+    public static XMVECTOR g_XMIdentityR3;
+
+    public constexpr float32 XM_PI = 3.141592654;
+    public constexpr float32 XM_2PI = 6.283185307;
+    public constexpr float32 XM_1DIV2PI = 0.159154943;
+    public constexpr float32 XM_PIDIV2 = 1.570796327;
+
+    static constructor() {
+        uint32 XM_SELECT_0 = 0x00000000;
+        uint32 XM_SELECT_1 = 0xFFFFFFFF;
+
+        g_XMSelect1110 = new XMVECTOR();
+        g_XMSelect1110.e[0] = *((float32*)&XM_SELECT_1);
+        g_XMSelect1110.e[1] = *((float32*)&XM_SELECT_1);
+        g_XMSelect1110.e[2] = *((float32*)&XM_SELECT_1);
+        g_XMSelect1110.e[3] = *((float32*)&XM_SELECT_0);
+        g_XMIdentityR3 = new XMVECTOR();
+        g_XMIdentityR3.e[0] = 0;
+        g_XMIdentityR3.e[1] = 0;
+        g_XMIdentityR3.e[2] = 0;
+        g_XMIdentityR3.e[3] = 1;
+    }
+
+    public static XMVECTOR MakeVector(float32[]! e) {
+        XMVECTOR Result = new XMVECTOR();
+        Result.e[0] = e[0];
+        Result.e[1] = e[1];
+        Result.e[2] = e[2];
+        Result.e[3] = e[3];
+        return Result;
+    }
+
+    public static XMMATRIX XMMatrixLookAtLH(XMVECTOR EyePosition, XMVECTOR FocusPosition, XMVECTOR UpDirection) {
+        XMVECTOR EyeDirection = XMVectorSubtract(FocusPosition, EyePosition);
+        return XMMatrixLookToLH(EyePosition, EyeDirection, UpDirection);
+    }
+
+    public static XMVECTOR XMVectorSubtract(XMVECTOR V1, XMVECTOR V2) {
+        XMVECTOR Result = new XMVECTOR();
+        Result.e[0] = V1.e[0] - V2.e[0];
+        Result.e[1] = V1.e[1] - V2.e[1];
+        Result.e[2] = V1.e[2] - V2.e[2];
+        Result.e[3] = V1.e[3] - V2.e[3];
+        return Result;
+    }
+
+    public static XMMATRIX XMMatrixLookToLH(XMVECTOR EyePosition, XMVECTOR EyeDirection, XMVECTOR UpDirection) {
+        XMVECTOR R2 = XMVector3Normalize(EyeDirection);
+        XMVECTOR R0 = XMVector3Cross(UpDirection, R2);
+        R0 = XMVector3Normalize(R0);
+        XMVECTOR R1 = XMVector3Cross(R2, R0);
+        XMVECTOR NegEyePosition = XMVectorNegate(EyePosition);
+        XMVECTOR D0 = XMVector3Dot(R0, NegEyePosition);
+        XMVECTOR D1 = XMVector3Dot(R1, NegEyePosition);
+        XMVECTOR D2 = XMVector3Dot(R2, NegEyePosition);
+        XMMATRIX M = new XMMATRIX();
+        M.r0 = XMVectorSelect(D0, R0, g_XMSelect1110);
+        M.r1 = XMVectorSelect(D1, R1, g_XMSelect1110);
+        M.r2 = XMVectorSelect(D2, R2, g_XMSelect1110);
+        M.r3 = g_XMIdentityR3;
+        M = XMMatrixTranspose(M);
+        return M;
+    }
+
+    public static XMVECTOR XMVector3Normalize(XMVECTOR V) {
+        XMVECTOR Result = XMVector3Length(V);
+        float32 fLength = Result.e[0];
+        if (fLength > 0) fLength = 1.0 / fLength;
+        Result.e[0] = V.e[0] * fLength;
+        Result.e[1] = V.e[1] * fLength;
+        Result.e[2] = V.e[2] * fLength;
+        Result.e[3] = V.e[3] * fLength;
+        return Result;
+    }
+
+    public static XMVECTOR XMVector3Length(XMVECTOR V) {
+        XMVECTOR Result = XMVector3LengthSq(V);
+        Result = XMVectorSqrt(Result);
+        return Result;
+    }
+
+    public static XMVECTOR XMVector3LengthSq(XMVECTOR V) {
+        return XMVector3Dot(V, V);
+    }
+
+    public static XMVECTOR XMVector3Dot(XMVECTOR V1, XMVECTOR V2) {
+        float32 fValue = V1.e[0] * V2.e[0] + V1.e[1] * V2.e[1] + V1.e[2] * V2.e[2];
+        XMVECTOR Result = new XMVECTOR();
+        Result.e[0] = fValue;
+        Result.e[1] = fValue;
+        Result.e[2] = fValue;
+        Result.e[3] = fValue;
+        return Result;
+    }
+
+    public static XMVECTOR XMVectorSqrt(XMVECTOR V) {
+        XMVECTOR Result = new XMVECTOR();
+        Result.e[0] = (float32)Math.Sqrt(V.e[0]);
+        Result.e[1] = (float32)Math.Sqrt(V.e[1]);
+        Result.e[2] = (float32)Math.Sqrt(V.e[2]);
+        Result.e[3] = (float32)Math.Sqrt(V.e[3]);
+        return Result;
+    }
+
+    public static XMVECTOR XMVector3Cross(XMVECTOR V1, XMVECTOR V2) {
+        XMVECTOR Result = new XMVECTOR();
+        Result.e[0] = (V1.e[1] * V2.e[2]) - (V1.e[2] * V2.e[1]);
+        Result.e[1] = (V1.e[2] * V2.e[0]) - (V1.e[0] * V2.e[2]);
+        Result.e[2] = (V1.e[0] * V2.e[1]) - (V1.e[1] * V2.e[0]);
+        Result.e[3] = 0;
+        return Result;
+    }
+
+    public static XMVECTOR XMVectorNegate(XMVECTOR V) {
+        XMVECTOR Result = new XMVECTOR();
+        Result.e[0] = -V.e[0];
+        Result.e[1] = -V.e[1];
+        Result.e[2] = -V.e[2];
+        Result.e[3] = -V.e[3];
+        return Result;
+    }
+
+    public static XMVECTOR XMVectorSelect(XMVECTOR V1, XMVECTOR V2, XMVECTOR Control) {
+        XMVECTOR Result = new XMVECTOR();
+        uint32 i0 = (uint32)(((*((uint32*)&V1.e[0])) & ~(*((uint32*)&Control.e[0]))) | ((*((uint32*)&V2.e[0])) & (*((uint32*)&Control.e[0]))));
+        uint32 i1 = (uint32)(((*((uint32*)&V1.e[1])) & ~(*((uint32*)&Control.e[1]))) | ((*((uint32*)&V2.e[1])) & (*((uint32*)&Control.e[1]))));
+        uint32 i2 = (uint32)(((*((uint32*)&V1.e[2])) & ~(*((uint32*)&Control.e[2]))) | ((*((uint32*)&V2.e[2])) & (*((uint32*)&Control.e[2]))));
+        uint32 i3 = (uint32)(((*((uint32*)&V1.e[3])) & ~(*((uint32*)&Control.e[3]))) | ((*((uint32*)&V2.e[3])) & (*((uint32*)&Control.e[3]))));
+        Result.e[0] = *((float32*)&i0);
+        Result.e[1] = *((float32*)&i1);
+        Result.e[2] = *((float32*)&i2);
+        Result.e[3] = *((float32*)&i3);
+        return Result;
+    }
+
+    public static XMMATRIX XMMatrixTranspose(XMMATRIX M) {
+        XMMATRIX P = new XMMATRIX();
+        P.r0 = XMVectorMergeXY(M.r0, M.r2);
+        P.r1 = XMVectorMergeXY(M.r1, M.r3);
+        P.r2 = XMVectorMergeZW(M.r0, M.r2);
+        P.r3 = XMVectorMergeZW(M.r1, M.r3);
+        XMMATRIX MT = new XMMATRIX();
+        MT.r0 = XMVectorMergeXY(P.r0, P.r1);
+        MT.r1 = XMVectorMergeZW(P.r0, P.r1);
+        MT.r2 = XMVectorMergeXY(P.r2, P.r3);
+        MT.r3 = XMVectorMergeZW(P.r2, P.r3);
+        return MT;
+    }
+
+    public static XMVECTOR XMVectorMergeXY(XMVECTOR V1, XMVECTOR V2) {
+        XMVECTOR Result = new XMVECTOR();
+        Result.e[0] = V1.e[0];
+        Result.e[1] = V2.e[0];
+        Result.e[2] = V1.e[1];
+        Result.e[3] = V2.e[1];
+        return Result;
+    }
+
+    public static XMVECTOR XMVectorMergeZW(XMVECTOR V1, XMVECTOR V2) {
+        XMVECTOR Result = new XMVECTOR();
+        Result.e[0] = V1.e[2];
+        Result.e[1] = V2.e[2];
+        Result.e[2] = V1.e[3];
+        Result.e[3] = V2.e[3];
+        return Result;
+    }
+
+    public static XMMATRIX XMMatrixPerspectiveFovLH(float32 FovAngleY, float32 AspectRatio, float32 NearZ, float32 FarZ) {
+        float32 SinFov = 0;
+        float32 CosFov = 0;
+        XMScalarSinCos(&SinFov, &CosFov, 0.5 * FovAngleY);
+
+        float32 Height = CosFov / SinFov;
+        float32 Width = Height / AspectRatio;
+        float32 fRange = FarZ / (FarZ - NearZ);
+
+        XMMATRIX M = new XMMATRIX();
+        M.r0.e[0] = Width;
+        M.r0.e[1] = 0.0;
+        M.r0.e[2] = 0.0;
+        M.r0.e[3] = 0.0;
+
+        M.r1.e[0] = 0.0;
+        M.r1.e[1] = Height;
+        M.r1.e[2] = 0.0;
+        M.r1.e[3] = 0.0;
+
+        M.r2.e[0] = 0.0;
+        M.r2.e[1] = 0.0;
+        M.r2.e[2] = fRange;
+        M.r2.e[3] = 1.0;
+
+        M.r3.e[0] = 0.0;
+        M.r3.e[1] = 0.0;
+        M.r3.e[2] = -fRange * NearZ;
+        M.r3.e[3] = 0.0;
+        return M;
+    }
+
+    public static void XMScalarSinCos(float32* pSin, float32* pCos, float32 Value) {
+        float32 quotient = XM_1DIV2PI * Value;
+
+        if (Value >= 0.0)
+            quotient = (float32)(int32)(quotient + 0.5);
+        else
+            quotient = (float32)(int32)(quotient - 0.5);
+
+        float32 y = Value - XM_2PI * quotient;
+        float32 sign = 0;
+
+        if (y > XM_PIDIV2) {
+            y = XM_PI - y;
+            sign = -1.0;
+        } else if (y < -XM_PIDIV2) {
+            y = -XM_PI - y;
+            sign = -1.0;
+        } else {
+            sign = +1.0;
+        }
+
+        float32 y2 = y * y;
+
+        *pSin = (((((-2.3889859e-08 * y2 + 2.7525562e-06) * y2 - 0.00019840874) * y2 + 0.0083333310) * y2 - 0.16666667) * y2 + 1.0) * y;
+
+        float32 p = ((((-2.6051615e-07 * y2 + 2.4760495e-05) * y2 - 0.0013888378) * y2 + 0.041666638) * y2 - 0.5) * y2 + 1.0;
+        *pCos = sign * p;
+    }
+
+    public static XMMATRIX XMMatrixMultiply(XMMATRIX M1, XMMATRIX M2) {
+        XMMATRIX mResult = new XMMATRIX();
+
+        float32 x = M1.r0.e[0];
+        float32 y = M1.r0.e[1];
+        float32 z = M1.r0.e[2];
+        float32 w = M1.r0.e[3];
+
+        mResult.r0.e[0] = (M2.r0.e[0] * x) + (M2.r1.e[0] * y) + (M2.r2.e[0] * z) + (M2.r3.e[0] * w);
+        mResult.r0.e[1] = (M2.r0.e[1] * x) + (M2.r1.e[1] * y) + (M2.r2.e[1] * z) + (M2.r3.e[1] * w);
+        mResult.r0.e[2] = (M2.r0.e[2] * x) + (M2.r1.e[2] * y) + (M2.r2.e[2] * z) + (M2.r3.e[2] * w);
+        mResult.r0.e[3] = (M2.r0.e[3] * x) + (M2.r1.e[3] * y) + (M2.r2.e[3] * z) + (M2.r3.e[3] * w);
+
+        x = M1.r1.e[0];
+        y = M1.r1.e[1];
+        z = M1.r1.e[2];
+        w = M1.r1.e[3];
+
+        mResult.r1.e[0] = (M2.r0.e[0] * x) + (M2.r1.e[0] * y) + (M2.r2.e[0] * z) + (M2.r3.e[0] * w);
+        mResult.r1.e[1] = (M2.r0.e[1] * x) + (M2.r1.e[1] * y) + (M2.r2.e[1] * z) + (M2.r3.e[1] * w);
+        mResult.r1.e[2] = (M2.r0.e[2] * x) + (M2.r1.e[2] * y) + (M2.r2.e[2] * z) + (M2.r3.e[2] * w);
+        mResult.r1.e[3] = (M2.r0.e[3] * x) + (M2.r1.e[3] * y) + (M2.r2.e[3] * z) + (M2.r3.e[3] * w);
+
+        x = M1.r2.e[0];
+        y = M1.r2.e[1];
+        z = M1.r2.e[2];
+        w = M1.r2.e[3];
+
+        mResult.r2.e[0] = (M2.r0.e[0] * x) + (M2.r1.e[0] * y) + (M2.r2.e[0] * z) + (M2.r3.e[0] * w);
+        mResult.r2.e[1] = (M2.r0.e[1] * x) + (M2.r1.e[1] * y) + (M2.r2.e[1] * z) + (M2.r3.e[1] * w);
+        mResult.r2.e[2] = (M2.r0.e[2] * x) + (M2.r1.e[2] * y) + (M2.r2.e[2] * z) + (M2.r3.e[2] * w);
+        mResult.r2.e[3] = (M2.r0.e[3] * x) + (M2.r1.e[3] * y) + (M2.r2.e[3] * z) + (M2.r3.e[3] * w);
+
+        x = M1.r3.e[0];
+        y = M1.r3.e[1];
+        z = M1.r3.e[2];
+        w = M1.r3.e[3];
+
+        mResult.r3.e[0] = (M2.r0.e[0] * x) + (M2.r1.e[0] * y) + (M2.r2.e[0] * z) + (M2.r3.e[0] * w);
+        mResult.r3.e[1] = (M2.r0.e[1] * x) + (M2.r1.e[1] * y) + (M2.r2.e[1] * z) + (M2.r3.e[1] * w);
+        mResult.r3.e[2] = (M2.r0.e[2] * x) + (M2.r1.e[2] * y) + (M2.r2.e[2] * z) + (M2.r3.e[2] * w);
+        mResult.r3.e[3] = (M2.r0.e[3] * x) + (M2.r1.e[3] * y) + (M2.r2.e[3] * z) + (M2.r3.e[3] * w);
+
+        return mResult;
+    }
+}
