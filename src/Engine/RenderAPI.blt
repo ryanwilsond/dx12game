@@ -11,6 +11,8 @@ public class RenderAPI {
     private RECT _sRREct;
     private XMMATRIX _viewProjectionMatrix;
     private D12Resource _cBPassData;
+    private D12Resource _depthBuffer;
+    private D12DescriptorHeap _depthDescHeap;
     private char* _deviceName;
     private uint32 _width = 0;
     private uint32 _height = 0;
@@ -71,14 +73,28 @@ public class RenderAPI {
             return;
         }
 
-        Vertex* verticesBox = (Vertex*)malloc((uint64)(sizeof(Vertex) * 6));
-
-        verticesBox[0] = Helpers.MakeVertex(x: -1, y: -1, z: -1, r: 1, g: 0, b: 0, a: 1);
-        verticesBox[1] = Helpers.MakeVertex(x: -1, y: 1, z: -1, r: 0, g: 1, b: 0, a: 1);
-        verticesBox[2] = Helpers.MakeVertex(x: 1, y: -1, z: -1, r: 0, g: 0, b: 1, a: 1);
-        verticesBox[3] = Helpers.MakeVertex(x: -1, y: 1, z: -1, r: 0, g: 1, b: 0, a: 1);
-        verticesBox[4] = Helpers.MakeVertex(x: 1, y: 1, z: -1, r: 1, g: 0, b: 0, a: 1);
-        verticesBox[5] = Helpers.MakeVertex(x: 1, y: -1, z: -1, r: 0, g: 0, b: 1, a: 1);
+        Vertex* verticesBox = (Vertex*)malloc((uint64)(sizeof(Vertex) * 20));
+        // Front face
+        verticesBox[0] =  Helpers.MakeVertex(-1, -1, -1, r: 1, g: 0, b: 0, a: 1);
+        verticesBox[1] =  Helpers.MakeVertex(-1,  1, -1, r: 0, g: 1, b: 0, a: 1);
+        verticesBox[2] =  Helpers.MakeVertex( 1, -1, -1, r: 0, g: 0, b: 1, a: 1);
+        verticesBox[3] =  Helpers.MakeVertex(-1,  1, -1, r: 0, g: 1, b: 0, a: 1);
+        verticesBox[4] =  Helpers.MakeVertex( 1,  1, -1, r: 1, g: 0, b: 0, a: 1);
+        verticesBox[5] =  Helpers.MakeVertex( 1, -1, -1, r: 0, g: 0, b: 1, a: 1);
+        // Back face
+        verticesBox[6] =  Helpers.MakeVertex(-1,  1,  1, r: 0, g: 1, b: 0, a: 1);
+        verticesBox[7] =  Helpers.MakeVertex(-1, -1,  1, r: 0, g: 1, b: 0, a: 1);
+        verticesBox[8] =  Helpers.MakeVertex( 1,  1,  1, r: 0, g: 1, b: 0, a: 1);
+        verticesBox[9] =  Helpers.MakeVertex(-1, -1,  1, r: 0, g: 1, b: 0, a: 1);
+        verticesBox[10] = Helpers.MakeVertex( 1, -1,  1, r: 0, g: 1, b: 0, a: 1);
+        verticesBox[11] = Helpers.MakeVertex( 1,  1,  1, r: 0, g: 1, b: 0, a: 1);
+        // Left face
+        verticesBox[12] = Helpers.MakeVertex(-1, -1,  1, r: 0, g: 0.65, b: 0.8, a: 1);
+        verticesBox[13] = Helpers.MakeVertex(-1,  1,  1, r: 0, g: 0.65, b: 0.8, a: 1);
+        verticesBox[14] = Helpers.MakeVertex(-1, -1, -1, r: 0, g: 0.65, b: 0.8, a: 1);
+        verticesBox[15] = Helpers.MakeVertex(-1,  1,  1, r: 0, g: 0.65, b: 0.8, a: 1);
+        verticesBox[16] = Helpers.MakeVertex(-1,  1, -1, r: 0, g: 0.65, b: 0.8, a: 1);
+        verticesBox[17] = Helpers.MakeVertex(-1, -1, -1, r: 0, g: 0.65, b: 0.8, a: 1);
 
         // Vertex* verticies = (Vertex*)malloc((uint64)(sizeof(Vertex) * 3));
 
@@ -91,7 +107,7 @@ public class RenderAPI {
         //         verticies[i] = Helpers.MakeVertex(x: 0.5, y: -0.5, z: 0, r: 0, g: 0, b: 1, a: 1);
         // }
 
-        memcpy(_dynamicVertexBuffer.GetCPUMemory(), (void*)verticesBox, (uint64)(sizeof(Vertex) * 6));
+        memcpy(_dynamicVertexBuffer.GetCPUMemory(), (void*)verticesBox, (uint64)(sizeof(Vertex) * 20));
         // free((void*)verticies);
 
         free((void*)verticesBox);
@@ -104,6 +120,22 @@ public class RenderAPI {
             ..SizeInBytes = $Helpers.KBs(16);
 
         _basePipeLine = new D12PipelineState()..Initialize(_device.ptr);
+        _depthBuffer = new D12Resource()..InitializeAsDepthBuffer(_device.ptr, _width, _height);
+        _depthDescHeap = new D12DescriptorHeap()..InitializeDepthHeap(_device.ptr);
+
+        var descVtbl = *(void***)_depthDescHeap.ptr;
+        var GetCPUDescriptorHandleForHeapStart = (D3D12_CPU_DESCRIPTOR_HANDLE*(ID3D12DescriptorHeap*)*~)descVtbl[9];
+        D3D12_CPU_DESCRIPTOR_HANDLE* cpuDescriptorHandleForHeapStart = GetCPUDescriptorHandleForHeapStart(_depthDescHeap.ptr);
+
+        D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = new D3D12_DEPTH_STENCIL_VIEW_DESC()
+            ..Format = DXGI_FORMAT_D32_FLOAT
+            ..ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D
+            ..Texture2D = (new D3D12_TEX2D_DSV()
+                ..MipSlice = 0)
+            ..Flags = D3D12_DSV_FLAG_NONE;
+
+        var CreateDepthStencilView = (void(ID3D12Device*, ID3D12Resource*, D3D12_DEPTH_STENCIL_VIEW_DESC*, D3D12_CPU_DESCRIPTOR_HANDLE)*~)deviceVtbl[21];
+        CreateDepthStencilView(_device.ptr, _depthBuffer.ptr, &dsvDesc, *cpuDescriptorHandleForHeapStart);
 
         _viewport = new D3D12_VIEWPORT()
             ..TopLeftX = 0
@@ -120,7 +152,7 @@ public class RenderAPI {
         _sRREct.bottom = (int32)_viewport.Height;
 
         XMMATRIX viewMatrix = XMath.XMMatrixLookAtLH(
-            XMath.MakeVector(new float32[] { 0, 1, -3, 0 }),
+            XMath.MakeVector(new float32[] { -2, 3, -3, 0 }),
             XMath.MakeVector(new float32[] { 0, 0, 0, 0 }),
             XMath.MakeVector(new float32[] { 0, 1, 0, 0 })
         );
@@ -154,7 +186,6 @@ public class RenderAPI {
             ..d2 = D3D12_RESOURCE_STATE_PRESENT
             ..d3 = D3D12_RESOURCE_STATE_RENDER_TARGET;
 
-        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = _swapChain.GetCurrentRTVHandle();
         ID3D12GraphicsCommandList* gcl = _commandList.GFXCmd();
 
         var gclVtbl = *(void***)gcl;
@@ -162,14 +193,23 @@ public class RenderAPI {
         var ResourceBarrier = (int32(ID3D12GraphicsCommandList*, uint32, D3D12_RESOURCE_BARRIER*)*~)gclVtbl[26];
         ResourceBarrier(gcl, 1, &barrier);
 
+        D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = _swapChain.GetCurrentRTVHandle();
+
+        var descVtbl = *(void***)_depthDescHeap.ptr;
+        var GetCPUDescriptorHandleForHeapStart = (D3D12_CPU_DESCRIPTOR_HANDLE*(ID3D12DescriptorHeap*)*~)descVtbl[9];
+        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = *GetCPUDescriptorHandleForHeapStart(_depthDescHeap.ptr);
+
         var color = new XMFLOAT4();
         color.w = 1;
 
-        var ClearRenderTargetView = (int32(ID3D12GraphicsCommandList*, D3D12_CPU_DESCRIPTOR_HANDLE, float32*, uint32, RECT*)*~)gclVtbl[48];
+        var ClearRenderTargetView = (void(ID3D12GraphicsCommandList*, D3D12_CPU_DESCRIPTOR_HANDLE, float32*, uint32, RECT*)*~)gclVtbl[48];
         ClearRenderTargetView(gcl, rtvHandle, (float32*)&color, 0, nullptr);
 
+        var ClearDepthStencilView = (void(ID3D12GraphicsCommandList*, D3D12_CPU_DESCRIPTOR_HANDLE, uint32, float32, uint8, uint32, RECT*)*~)gclVtbl[47];
+        ClearDepthStencilView(gcl, dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1, 0, 0, nullptr);
+
         var OMSetRenderTargets = (void(ID3D12GraphicsCommandList*, uint32, D3D12_CPU_DESCRIPTOR_HANDLE*, uint32, D3D12_CPU_DESCRIPTOR_HANDLE*)*~)gclVtbl[46];
-        OMSetRenderTargets(gcl, 1, &rtvHandle, 0, nullptr);
+        OMSetRenderTargets(gcl, 1, &rtvHandle, 0, &dsvHandle);
 
         var RSSetViewports = (void(ID3D12GraphicsCommandList*, uint32, D3D12_VIEWPORT*)*~)gclVtbl[21];
         RSSetViewports(gcl, 1, &_viewport);
@@ -199,7 +239,7 @@ public class RenderAPI {
         // ** Draw calls here
         {
             var DrawInstanced = (void(ID3D12GraphicsCommandList*, uint32, uint32, uint32, uint32)*~)gclVtbl[12];
-            DrawInstanced(gcl, 6, 1, 0, 0);
+            DrawInstanced(gcl, 18, 1, 0, 0);
         }
 
         barrier = new D3D12_RESOURCE_BARRIER()
@@ -239,6 +279,10 @@ public class RenderAPI {
     constexpr uint32 D3D12_HEAP_TYPE_UPLOAD = 2;
     constexpr uint32 D3D12_RESOURCE_STATE_GENERIC_READ = (uint32)(((((0x1 | 0x2) | 0x40) | 0x80) | 0x200) | 0x800);
     constexpr uint32 D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST = 4;
+    constexpr uint32 DXGI_FORMAT_D32_FLOAT = 40;
+    constexpr uint32 D3D12_DSV_DIMENSION_TEXTURE2D = 3;
+    constexpr uint32 D3D12_DSV_FLAG_NONE = 0;
+    constexpr uint32 D3D12_CLEAR_FLAG_DEPTH = 1;
 
     [DllImport("msvcrt.dll", CallingConvention: CallingConvention.Cdecl)]
     static extern void* memcpy(void* dest, void* src, uint64 count);

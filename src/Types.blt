@@ -419,3 +419,26 @@ public struct XMMATRIX {
 public struct PassData {
     public XMMATRIX viewProjection;
 }
+
+public struct D3D12_DEPTH_STENCIL_VALUE {
+    public float32 Depth;
+    public uint8 Stencil;
+}
+
+public struct D3D12_CLEAR_VALUE {
+    public uint32 Format;
+    public D3D12_DEPTH_STENCIL_VALUE DepthStencil;
+}
+
+public struct D3D12_TEX2D_DSV {
+    public uint32 MipSlice;
+}
+
+public struct D3D12_DEPTH_STENCIL_VIEW_DESC {
+    public uint32 Format;
+    public uint32 ViewDimension;
+    public uint32 Flags;
+    public D3D12_TEX2D_DSV Texture2D;
+    uint32 u0;
+    uint32 u1;
+}

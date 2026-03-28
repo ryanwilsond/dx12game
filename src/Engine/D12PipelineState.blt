@@ -45,12 +45,12 @@ public class D12PipelineState {
 
         desc.RasterizerState = new D3D12_RASTERIZER_DESC()
             ..FillMode = D3D12_FILL_MODE_SOLID
-            ..CullMode = D3D12_CULL_MODE_FRONT
-            ..FrontCounterClockwise = 1
+            ..CullMode = D3D12_CULL_MODE_NONE
+            ..FrontCounterClockwise = 0
             ..DepthClipEnable = 1
             ..ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
-        desc.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+        desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
         desc.DepthStencilState = new D3D12_DEPTH_STENCIL_DESC()
             ..DepthEnable = 1
             ..DepthFunc = D3D12_COMPARISON_FUNC_LESS
@@ -121,6 +121,7 @@ public class D12PipelineState {
 
     constexpr uint32 D3D12_FILL_MODE_SOLID = 3;
     constexpr uint32 D3D12_CULL_MODE_FRONT = 2;
+    constexpr uint32 D3D12_CULL_MODE_NONE = 1;
     constexpr uint32 D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF = 0;
     constexpr uint32 D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE = 3;
     constexpr uint32 DXGI_FORMAT_R16G16B16A16_FLOAT = 10;
@@ -136,6 +137,7 @@ public class D12PipelineState {
     constexpr uint32 DXGI_FORMAT_D24_UNORM_S8_UINT = 45;
     constexpr uint32 D3D12_COMPARISON_FUNC_LESS = 2;
     constexpr uint32 D3D12_DEPTH_WRITE_MASK_ALL = 1;
+    constexpr uint32 DXGI_FORMAT_D32_FLOAT = 40;
 }
 
 public struct InputElementDesc2 {
