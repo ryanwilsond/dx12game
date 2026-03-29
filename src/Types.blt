@@ -442,3 +442,9 @@ public struct D3D12_DEPTH_STENCIL_VIEW_DESC {
     uint32 u0;
     uint32 u1;
 }
+
+public struct D3D12_INDEX_BUFFER_VIEW {
+    public uint64 BufferLocation;
+    public uint32 SizeInBytes;
+    public uint32 Format;
+}

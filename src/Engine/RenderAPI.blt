@@ -13,9 +13,15 @@ public class RenderAPI {
     private D12Resource _cBPassData;
     private D12Resource _depthBuffer;
     private D12DescriptorHeap _depthDescHeap;
+    private D12Resource _dynamicIndexBuffer;
+    private D3D12_INDEX_BUFFER_VIEW _dynamicIBView;
+    private BufferUploader _bufferUploader;
     private char* _deviceName;
     private uint32 _width = 0;
     private uint32 _height = 0;
+
+    private constexpr uint16 IndicesCount = 39;
+    private constexpr uint16 VerticesCount = 8;
 
     public void Initialize(int64* hWnd, uint32 width, uint32 height) {
         _width = width;
@@ -59,6 +65,36 @@ public class RenderAPI {
         _commandQueue = new D12CommandQueue()..Initialize(_device.ptr);
         _commandList = new D12CommandList()..Initialize(_device.ptr);
         _swapChain = new DXGISwapChain()..Initialize(_device.ptr, (IDXGIFactory2*)factory.ptr, _commandQueue.ptr, hWnd, _width, _height);
+
+        _bufferUploader = new BufferUploader()..Initialize(_device.ptr, $Helpers.KBs(64));
+
+        Vertex verticesBox[VerticesCount];
+
+        verticesBox[0] =  $Helpers.MakeVertex(-1,  1,  1, 1, 0, 0, 1);
+        verticesBox[1] =  $Helpers.MakeVertex(-1, -1,  1, 0, 1, 0, 1);
+        verticesBox[2] =  $Helpers.MakeVertex(-1,  1, -1, 0, 0, 1, 1);
+        verticesBox[3] =  $Helpers.MakeVertex(-1, -1, -1, 1, 0, 0, 1);
+        verticesBox[4] =  $Helpers.MakeVertex( 1,  1,  1, 0, 1, 0, 1);
+        verticesBox[5] =  $Helpers.MakeVertex( 1, -1,  1, 1, 0, 1, 1);
+        verticesBox[6] =  $Helpers.MakeVertex( 1,  1, -1, 1, 0, 0, 1);
+        verticesBox[7] =  $Helpers.MakeVertex( 1, -1, -1, 0, 1, 0, 1);
+
+        uint32 indices[IndicesCount];
+
+        indices[0]  = 0; indices[1]  = 2; indices[2]  = 4;
+        indices[3]  = 2; indices[4]  = 7; indices[5]  = 3;
+        indices[6]  = 6; indices[7]  = 5; indices[8]  = 7;
+        indices[9]  = 1; indices[10] = 7; indices[11] = 5;
+        indices[12] = 0; indices[13] = 3; indices[14] = 1;
+        indices[15] = 4; indices[16] = 1; indices[17] = 5;
+        indices[18] = 4; indices[19] = 6; indices[20] = 2;
+        indices[21] = 2; indices[22] = 6; indices[23] = 7;
+        indices[24] = 6; indices[25] = 4; indices[26] = 5;
+        indices[27] = 6; indices[28] = 4; indices[29] = 5;
+        indices[30] = 1; indices[31] = 3; indices[32] = 7;
+        indices[33] = 0; indices[34] = 2; indices[35] = 3;
+        indices[36] = 4; indices[37] = 0; indices[38] = 1;
+
         _dynamicVertexBuffer = new D12Resource()..Initialize(_device.ptr, $Helpers.KBs(16), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
 
         var resVtbl = *(void***)_dynamicVertexBuffer.ptr;
@@ -73,51 +109,32 @@ public class RenderAPI {
             return;
         }
 
-        Vertex* verticesBox = (Vertex*)malloc((uint64)(sizeof(Vertex) * 20));
-        // Front face
-        verticesBox[0] =  Helpers.MakeVertex(-1, -1, -1, r: 1, g: 0, b: 0, a: 1);
-        verticesBox[1] =  Helpers.MakeVertex(-1,  1, -1, r: 0, g: 1, b: 0, a: 1);
-        verticesBox[2] =  Helpers.MakeVertex( 1, -1, -1, r: 0, g: 0, b: 1, a: 1);
-        verticesBox[3] =  Helpers.MakeVertex(-1,  1, -1, r: 0, g: 1, b: 0, a: 1);
-        verticesBox[4] =  Helpers.MakeVertex( 1,  1, -1, r: 1, g: 0, b: 0, a: 1);
-        verticesBox[5] =  Helpers.MakeVertex( 1, -1, -1, r: 0, g: 0, b: 1, a: 1);
-        // Back face
-        verticesBox[6] =  Helpers.MakeVertex(-1,  1,  1, r: 0, g: 1, b: 0, a: 1);
-        verticesBox[7] =  Helpers.MakeVertex(-1, -1,  1, r: 0, g: 1, b: 0, a: 1);
-        verticesBox[8] =  Helpers.MakeVertex( 1,  1,  1, r: 0, g: 1, b: 0, a: 1);
-        verticesBox[9] =  Helpers.MakeVertex(-1, -1,  1, r: 0, g: 1, b: 0, a: 1);
-        verticesBox[10] = Helpers.MakeVertex( 1, -1,  1, r: 0, g: 1, b: 0, a: 1);
-        verticesBox[11] = Helpers.MakeVertex( 1,  1,  1, r: 0, g: 1, b: 0, a: 1);
-        // Left face
-        verticesBox[12] = Helpers.MakeVertex(-1, -1,  1, r: 0, g: 0.65, b: 0.8, a: 1);
-        verticesBox[13] = Helpers.MakeVertex(-1,  1,  1, r: 0, g: 0.65, b: 0.8, a: 1);
-        verticesBox[14] = Helpers.MakeVertex(-1, -1, -1, r: 0, g: 0.65, b: 0.8, a: 1);
-        verticesBox[15] = Helpers.MakeVertex(-1,  1,  1, r: 0, g: 0.65, b: 0.8, a: 1);
-        verticesBox[16] = Helpers.MakeVertex(-1,  1, -1, r: 0, g: 0.65, b: 0.8, a: 1);
-        verticesBox[17] = Helpers.MakeVertex(-1, -1, -1, r: 0, g: 0.65, b: 0.8, a: 1);
-
-        // Vertex* verticies = (Vertex*)malloc((uint64)(sizeof(Vertex) * 3));
-
-        // for (int! i = 0; i < 3; i++) {
-        //     if (i == 0)
-        //         verticies[i] = Helpers.MakeVertex(x: -0.5, y: -0.5, z: 0, r: 0, g: 1, b: 0, a: 1);
-        //     else if (i == 1)
-        //         verticies[i] = Helpers.MakeVertex(x: 0, y: 0.5, z: 0, r: 1, g: 0, b: 0, a: 1);
-        //     else
-        //         verticies[i] = Helpers.MakeVertex(x: 0.5, y: -0.5, z: 0, r: 0, g: 0, b: 1, a: 1);
-        // }
-
-        memcpy(_dynamicVertexBuffer.GetCPUMemory(), (void*)verticesBox, (uint64)(sizeof(Vertex) * 20));
-        // free((void*)verticies);
-
-        free((void*)verticesBox);
-
         var GetGPUVirtualAddress = (uint64(ID3D12Resource*)*~)resVtbl[11];
 
         _dynamicVBView = new D3D12_VERTEX_BUFFER_VIEW()
             ..BufferLocation = GetGPUVirtualAddress(_dynamicVertexBuffer.ptr)
             ..StrideInBytes = (uint32)sizeof(Vertex)
             ..SizeInBytes = $Helpers.KBs(16);
+
+        _dynamicIndexBuffer = new D12Resource()..Initialize(_device.ptr, $Helpers.KBs(16), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
+
+        resourceName = LowLevel.CreateLPCWSTR("Dynamic index buffer");
+        hr = SetNameRes(_dynamicIndexBuffer.ptr, resourceName);
+        LowLevel.FreeLPCWSTR(resourceName);
+
+        if (hr != 0) {
+            Console.Print("SetName failed: ");
+            Console.PrintLine(hr);
+            return;
+        }
+
+        _dynamicIBView = new D3D12_INDEX_BUFFER_VIEW()
+            ..BufferLocation = GetGPUVirtualAddress(_dynamicIndexBuffer.ptr)
+            ..Format = DXGI_FORMAT_R32_UINT
+            ..SizeInBytes = $Helpers.KBs(16);
+
+        memcpy(_dynamicVertexBuffer.GetCPUMemory(), (void*)verticesBox, (uint64)(sizeof(Vertex) * VerticesCount));
+        memcpy(_dynamicIndexBuffer.GetCPUMemory(), (void*)indices, (uint64)(sizeof(uint32) * IndicesCount));
 
         _basePipeLine = new D12PipelineState()..Initialize(_device.ptr);
         _depthBuffer = new D12Resource()..InitializeAsDepthBuffer(_device.ptr, _width, _height);
@@ -145,11 +162,11 @@ public class RenderAPI {
             ..MinDepth = 0
             ..MaxDepth = 1;
 
-        _sRREct = new RECT();
-        _sRREct.left = 0;
-        _sRREct.right = (int32)_viewport.Width;
-        _sRREct.top = 0;
-        _sRREct.bottom = (int32)_viewport.Height;
+        _sRREct = new RECT()
+            ..left = 0
+            ..right = (int32)_viewport.Width
+            ..top = 0
+            ..bottom = (int32)_viewport.Height;
 
         XMMATRIX viewMatrix = XMath.XMMatrixLookAtLH(
             XMath.MakeVector(new float32[] { -2, 3, -3, 0 }),
@@ -229,6 +246,9 @@ public class RenderAPI {
         var IASetVertexBuffers = (void(ID3D12GraphicsCommandList*, uint32, uint32, D3D12_VERTEX_BUFFER_VIEW*)*~)gclVtbl[44];
         IASetVertexBuffers(gcl, 0, 1, &_dynamicVBView);
 
+        var IASetIndexBuffer = (void(ID3D12GraphicsCommandList*, D3D12_INDEX_BUFFER_VIEW*)*~)gclVtbl[43];
+        IASetIndexBuffer(gcl, &_dynamicIBView);
+
         var resVtbl = *(void***)_cBPassData.ptr;
 
         var GetGPUVirtualAddress = (uint64(ID3D12Resource*)*~)resVtbl[11];
@@ -238,8 +258,11 @@ public class RenderAPI {
 
         // ** Draw calls here
         {
-            var DrawInstanced = (void(ID3D12GraphicsCommandList*, uint32, uint32, uint32, uint32)*~)gclVtbl[12];
-            DrawInstanced(gcl, 18, 1, 0, 0);
+            // var DrawInstanced = (void(ID3D12GraphicsCommandList*, uint32, uint32, uint32, uint32)*~)gclVtbl[12];
+            // DrawInstanced(gcl, VerticiesCount, 1, 0, 0);
+
+            var DrawIndexedInstance = (void(ID3D12GraphicsCommandList*, uint32, uint32, uint32, int32, uint32)*~)gclVtbl[13];
+            DrawIndexedInstance(gcl, IndicesCount, 1, 0, 0, 0);
         }
 
         barrier = new D3D12_RESOURCE_BARRIER()
@@ -283,13 +306,8 @@ public class RenderAPI {
     constexpr uint32 D3D12_DSV_DIMENSION_TEXTURE2D = 3;
     constexpr uint32 D3D12_DSV_FLAG_NONE = 0;
     constexpr uint32 D3D12_CLEAR_FLAG_DEPTH = 1;
+    constexpr uint32 DXGI_FORMAT_R32_UINT = 42;
 
     [DllImport("msvcrt.dll", CallingConvention: CallingConvention.Cdecl)]
     static extern void* memcpy(void* dest, void* src, uint64 count);
-
-    [DllImport("msvcrt.dll", CallingConvention: CallingConvention.Cdecl)]
-    public static extern void* malloc(uint64 size);
-
-    [DllImport("msvcrt.dll", CallingConvention: CallingConvention.Cdecl)]
-    public static extern void free(void* ptr);
 }
