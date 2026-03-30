@@ -1,0 +1,19 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build debug",
+            "command": "buckle",
+            "type": "process",
+            "args": [
+                "src",
+                "src/Engine",
+                "-d",
+                "--debug",
+                "-o",
+                "bin/dx12game.dll"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+    ]
+}

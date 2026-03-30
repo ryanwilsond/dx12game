@@ -213,8 +213,9 @@ public class RenderAPI {
         D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = _swapChain.GetCurrentRTVHandle();
 
         var descVtbl = *(void***)_depthDescHeap.ptr;
-        var GetCPUDescriptorHandleForHeapStart = (D3D12_CPU_DESCRIPTOR_HANDLE*(ID3D12DescriptorHeap*)*~)descVtbl[9];
-        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = *GetCPUDescriptorHandleForHeapStart(_depthDescHeap.ptr);
+        var GetCPUDescriptorHandleForHeapStart = (void(ID3D12DescriptorHeap*, D3D12_CPU_DESCRIPTOR_HANDLE*)*~)descVtbl[9];
+        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = new D3D12_CPU_DESCRIPTOR_HANDLE();
+        GetCPUDescriptorHandleForHeapStart(_depthDescHeap.ptr, &dsvHandle);
 
         var color = new XMFLOAT4();
         color.w = 1;
