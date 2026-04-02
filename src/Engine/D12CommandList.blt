@@ -8,7 +8,7 @@ public class D12CommandList {
 
         var deviceVtbl = *(void***)pDevice;
         var CreateCommandAllocator = (int32(ID3D12Device*, int32, GUID*, void**)*~)deviceVtbl[9];
-        var hr = CreateCommandAllocator(pDevice, D3D12_COMMAND_LIST_TYPE_DIRECT, &caGuid, (void**)&_allocator);
+        var hr = CreateCommandAllocator(pDevice, D3D12.COMMAND_LIST_TYPE_DIRECT, &caGuid, (void**)&_allocator);
 
         if (hr != 0) {
             Console.Print("CreateCommandAllocator failed: ");
@@ -20,7 +20,7 @@ public class D12CommandList {
         var clGuid = Helpers.MakeGUID(0x7116d91c, 0xe7e4, 0x47ce, new int![] { 0xb8, 0xc6, 0xec, 0x81, 0x68, 0xf4, 0x37, 0xe5 });
 
         var CreateCommandList = (int32(ID3D12Device*, uint32, int32, ID3D12CommandAllocator*, void*, GUID*, void**)*~)deviceVtbl[12];
-        hr = CreateCommandList(pDevice, 0, D3D12_COMMAND_LIST_TYPE_DIRECT, _allocator, nullptr, &clGuid, (void**)&ptr);
+        hr = CreateCommandList(pDevice, 0, D3D12.COMMAND_LIST_TYPE_DIRECT, _allocator, nullptr, &clGuid, (void**)&ptr);
 
         if (hr != 0) {
             Console.Print("CreateCommandList failed: ");
@@ -46,6 +46,4 @@ public class D12CommandList {
     }
 
     public ID3D12CommandList* ptr;
-
-    constexpr int32 D3D12_COMMAND_LIST_TYPE_DIRECT = 0;
 }

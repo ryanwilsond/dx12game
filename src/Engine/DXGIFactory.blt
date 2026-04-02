@@ -4,7 +4,7 @@ public class DXGIFactory {
         // __uuidof(IDXGIFactory4)
         var guid = Helpers.MakeGUID(0x1bc6ea02, 0xef36, 0x464f, new int![] { 0xbf, 0x0c, 0x21, 0xca, 0x39, 0xe5, 0x16, 0x8a });
 
-        if (CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, &guid, (void**)(&ptr)) != 0)
+        if (CreateDXGIFactory2(DXGI.CREATE_FACTORY_DEBUG, &guid, (void**)(&ptr)) != 0)
             Console.PrintLine("CreateDXGIFactory2 failed");
     }
 
@@ -30,7 +30,7 @@ public class DXGIFactory {
 
         void** fac6Vtbl = *(void***)fac6;
         var EnumAdapterByGpuPreference = (int32(IDXGIFactory6*, uint32, uint32, GUID*, void**)*~)fac4Vtbl[29];
-        hr = EnumAdapterByGpuPreference(fac6, 0, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, &adapterGuid, (void**)(&adapter));
+        hr = EnumAdapterByGpuPreference(fac6, 0, DXGI.GPU_PREFERENCE_HIGH_PERFORMANCE, &adapterGuid, (void**)(&adapter));
 
         if (hr != 0) {
             Console.Print("EnumAdapterByGpuPreference failed: ");
@@ -42,10 +42,6 @@ public class DXGIFactory {
     }
 
     public IDXGIFactory4* ptr;
-
-    constexpr uint32 DXGI_CREATE_FACTORY_DEBUG = 0x1;
-
-    constexpr uint32 DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE = 0x2;
 
     [DllImport("dxgi.dll")]
     static extern int32 CreateDXGIFactory2(uint32 flags, GUID* riid, void** factory);

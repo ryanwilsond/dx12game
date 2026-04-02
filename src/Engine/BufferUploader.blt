@@ -5,7 +5,7 @@ public class BufferUploader {
     private uint32 _maxSize;
 
     public void Initialize(ID3D12Device* pDevice, uint32 memoryAllocation) {
-        _buffer = new D12Resource()..Initialize(pDevice, memoryAllocation, D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
+        _buffer = new D12Resource()..Initialize(pDevice, memoryAllocation, D3D12.HEAP_TYPE_UPLOAD, D3D12.RESOURCE_STATE_GENERIC_READ);
         _memory = _buffer.GetCPUMemory();
         _maxSize = memoryAllocation;
     }
@@ -24,9 +24,6 @@ public class BufferUploader {
         // CopyBufferRegion(gfx, desc->ptr, 0, _buffer.ptr, 0, size);
         // pCommandList.GFXCmd()
     }
-
-    constexpr uint32 D3D12_HEAP_TYPE_UPLOAD = 2;
-    constexpr uint32 D3D12_RESOURCE_STATE_GENERIC_READ = (uint32)(((((0x1 | 0x2) | 0x40) | 0x80) | 0x200) | 0x800);
 
     [DllImport("msvcrt.dll", CallingConvention: CallingConvention.Cdecl)]
     static extern void* memcpy(void* dest, void* src, uint64 count);

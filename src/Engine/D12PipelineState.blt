@@ -6,17 +6,17 @@ public class D12PipelineState {
     public void Initialize(ID3D12Device* pDevice) {
         _rootSignature = new D12RootSignature()..Initialize(pDevice);
         _shaders = new HLSLShader[] { new HLSLShader(), new HLSLShader() };
-        _shaders[0].Initialize("shaders/VS.hlsl", HLSLShader.SHADER_TYPE_VERTEX);
-        _shaders[1].Initialize("shaders/PS.hlsl", HLSLShader.SHADER_TYPE_PIXEL);
+        _shaders[0].Initialize("shaders/VS.hlsl", D3D12.SHADER_TYPE_VERTEX);
+        _shaders[1].Initialize("shaders/PS.hlsl", D3D12.SHADER_TYPE_PIXEL);
 
         D3D12_GRAPHICS_PIPELINE_STATE_DESC desc = new D3D12_GRAPHICS_PIPELINE_STATE_DESC()
             ..pRootSignature = _rootSignature.ptr
-            ..PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE
+            ..PrimitiveTopologyType = D3D12.PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE
             ..NumRenderTargets = 1
             ..NodeMask = 0
-            ..Flags = D3D12_PIPELINE_STATE_FLAG_NONE;
+            ..Flags = D3D12.PIPELINE_STATE_FLAG_NONE;
 
-        desc.RTVFormats[0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
+        desc.RTVFormats[0] = DXGI.FORMAT_R16G16B16A16_FLOAT;
 
         var VSByteCode = _shaders[0].GetByteCode();
         var PSByteCode = _shaders[1].GetByteCode();
@@ -36,7 +36,7 @@ public class D12PipelineState {
             ..RenderTarget_0 = (new D3D12_RENDER_TARGET_BLEND_DESC()
                 ..BlendEnable = 0
                 ..LogicOpEnable = 0
-                ..RenderTargetWriteMask = (uint8)D3D12_COLOR_WRITE_ENABLE_ALL);
+                ..RenderTargetWriteMask = (uint8)D3D12.COLOR_WRITE_ENABLE_ALL);
 
         desc.SampleMask = 0xFFFFFFFF;
         desc.SampleDesc = new DXGI_SAMPLE_DESC()
@@ -44,38 +44,40 @@ public class D12PipelineState {
             ..Quality = 0;
 
         desc.RasterizerState = new D3D12_RASTERIZER_DESC()
-            ..FillMode = D3D12_FILL_MODE_SOLID
-            ..CullMode = D3D12_CULL_MODE_NONE
+            ..FillMode = D3D12.FILL_MODE_SOLID
+            ..CullMode = D3D12.CULL_MODE_NONE
             ..FrontCounterClockwise = 0
             ..DepthClipEnable = 1
-            ..ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+            ..ConservativeRaster = D3D12.CONSERVATIVE_RASTERIZATION_MODE_OFF;
 
-        desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+        desc.DSVFormat = DXGI.FORMAT_D32_FLOAT;
         desc.DepthStencilState = new D3D12_DEPTH_STENCIL_DESC()
             ..DepthEnable = 1
-            ..DepthFunc = D3D12_COMPARISON_FUNC_LESS
-            ..DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+            ..DepthFunc = D3D12.COMPARISON_FUNC_LESS
+            ..DepthWriteMask = D3D12.DEPTH_WRITE_MASK_ALL;
 
         var semanticNamePos = LowLevel.CreateLPCSTR("POSITION");
         // var semanticNameCol = LowLevel.CreateLPCSTR("NORMAL");
         var semanticNameCol = LowLevel.CreateLPCSTR("COLOR");
 
-        D3D12_INPUT_ELEMENT_DESC element1 = new D3D12_INPUT_ELEMENT_DESC()
+        D3D12_INPUT_ELEMENT_DESC elements[2];
+
+        elements[0] = new D3D12_INPUT_ELEMENT_DESC()
             ..SemanticName = semanticNamePos
             ..SemanticIndex = 0
-            ..Format = DXGI_FORMAT_R32G32B32_FLOAT
+            ..Format = DXGI.FORMAT_R32G32B32_FLOAT
             ..InputSlot = 0
             ..AlignedByteOffset = 0
-            ..InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA
+            ..InputSlotClass = D3D12.INPUT_CLASSIFICATION_PER_VERTEX_DATA
             ..InstanceDataStepRate = 0;
 
-        D3D12_INPUT_ELEMENT_DESC element2 = new D3D12_INPUT_ELEMENT_DESC()
+        elements[1] = new D3D12_INPUT_ELEMENT_DESC()
             ..SemanticName = semanticNameCol
             ..SemanticIndex = 0
-            ..Format = DXGI_FORMAT_R32G32B32A32_FLOAT
+            ..Format = DXGI.FORMAT_R32G32B32A32_FLOAT
             ..InputSlot = 0
             ..AlignedByteOffset = 12
-            ..InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA
+            ..InputSlotClass = D3D12.INPUT_CLASSIFICATION_PER_VERTEX_DATA
             ..InstanceDataStepRate = 0;
 
         // D3D12_INPUT_ELEMENT_DESC element2 = new D3D12_INPUT_ELEMENT_DESC();
@@ -87,13 +89,9 @@ public class D12PipelineState {
         // element2.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA;
         // element2.InstanceDataStepRate = 0;
 
-        var elements = new InputElementDesc2()
-            ..element1 = element1
-            ..element2 = element2;
-
         D3D12_INPUT_LAYOUT_DESC inputLayout = new D3D12_INPUT_LAYOUT_DESC()
             ..NumElements = 2
-            ..pInputElementDescs = (D3D12_INPUT_ELEMENT_DESC*)&elements;
+            ..pInputElementDescs = elements;
 
         desc.InputLayout = inputLayout;
 
@@ -118,29 +116,4 @@ public class D12PipelineState {
     }
 
     public ID3D12PipelineState* ptr;
-
-    constexpr uint32 D3D12_FILL_MODE_SOLID = 3;
-    constexpr uint32 D3D12_CULL_MODE_FRONT = 2;
-    constexpr uint32 D3D12_CULL_MODE_NONE = 1;
-    constexpr uint32 D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF = 0;
-    constexpr uint32 D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE = 3;
-    constexpr uint32 DXGI_FORMAT_R16G16B16A16_FLOAT = 10;
-    constexpr uint32 D3D12_PIPELINE_STATE_FLAG_NONE = 0;
-    constexpr uint32 DXGI_FORMAT_R32G32B32_FLOAT = 6;
-    constexpr uint32 D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA = 0;
-    constexpr uint32 DXGI_FORMAT_R32G32B32A32_FLOAT = 2;
-    constexpr uint32 D3D12_COLOR_WRITE_ENABLE_RED = 0x1;
-    constexpr uint32 D3D12_COLOR_WRITE_ENABLE_GREEN = 0x2;
-    constexpr uint32 D3D12_COLOR_WRITE_ENABLE_BLUE = 0x4;
-    constexpr uint32 D3D12_COLOR_WRITE_ENABLE_ALPHA = 0x8;
-    constexpr uint32 D3D12_COLOR_WRITE_ENABLE_ALL = (uint32)(((D3D12_COLOR_WRITE_ENABLE_RED | D3D12_COLOR_WRITE_ENABLE_GREEN) | D3D12_COLOR_WRITE_ENABLE_BLUE) | D3D12_COLOR_WRITE_ENABLE_ALPHA);
-    constexpr uint32 DXGI_FORMAT_D24_UNORM_S8_UINT = 45;
-    constexpr uint32 D3D12_COMPARISON_FUNC_LESS = 2;
-    constexpr uint32 D3D12_DEPTH_WRITE_MASK_ALL = 1;
-    constexpr uint32 DXGI_FORMAT_D32_FLOAT = 40;
-}
-
-public struct InputElementDesc2 {
-    public D3D12_INPUT_ELEMENT_DESC element1;
-    public D3D12_INPUT_ELEMENT_DESC element2;
 }

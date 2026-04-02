@@ -6,9 +6,9 @@ public class D12DescriptorHeap {
         var heapGuid = Helpers.MakeGUID(0x8efb471d, 0x616c, 0x4f49, new int![] { 0x90, 0xf7, 0x12, 0x7b, 0xb7, 0x63, 0xfa, 0x51 });
 
         D3D12_DESCRIPTOR_HEAP_DESC heapDesc = new D3D12_DESCRIPTOR_HEAP_DESC()
-            ..Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV
+            ..Type = D3D12.DESCRIPTOR_HEAP_TYPE_DSV
             ..NumDescriptors = 1
-            ..Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE
+            ..Flags = D3D12.DESCRIPTOR_HEAP_FLAG_NONE
             ..NodeMask = 0;
 
         var deviceVtbl = *(void***)pDevice;
@@ -23,7 +23,4 @@ public class D12DescriptorHeap {
     }
 
     public ID3D12DescriptorHeap* ptr;
-
-    constexpr uint32 D3D12_DESCRIPTOR_HEAP_TYPE_DSV = 3;
-    constexpr uint32 D3D12_DESCRIPTOR_HEAP_FLAG_NONE = 0;
 }

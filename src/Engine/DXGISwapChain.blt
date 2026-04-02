@@ -14,17 +14,17 @@ public class DXGISwapChain {
         DXGI_SWAP_CHAIN_DESC1 desc = new DXGI_SWAP_CHAIN_DESC1()
             ..Width = width
             ..Height = height
-            ..Format = DXGI_FORMAT_R16G16B16A16_FLOAT
+            ..Format = DXGI.FORMAT_R16G16B16A16_FLOAT
             ..Stereo = false
             ..SampleDesc = (new DXGI_SAMPLE_DESC()
                 ..Count = 1
                 ..Quality = 0)
-            ..BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT
+            ..BufferUsage = DXGI.USAGE_RENDER_TARGET_OUTPUT
             ..BufferCount = 2
-            ..Scaling = DXGI_SCALING_NONE
-            ..SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD
-            ..AlphaMode = DXGI_ALPHA_MODE_IGNORE
-            ..Flags = (uint32)(DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+            ..Scaling = DXGI.SCALING_NONE
+            ..SwapEffect = DXGI.SWAP_EFFECT_FLIP_DISCARD
+            ..AlphaMode = DXGI.ALPHA_MODE_IGNORE
+            ..Flags = (uint32)(DXGI.SWAP_CHAIN_FLAG_ALLOW_TEARING | DXGI.SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
         _width = width;
         _height = height;
@@ -44,9 +44,9 @@ public class DXGISwapChain {
         var heapGuid = Helpers.MakeGUID(0x8efb471d, 0x616c, 0x4f49, new int![] { 0x90, 0xf7, 0x12, 0x7b, 0xb7, 0x63, 0xfa, 0x51 });
 
         D3D12_DESCRIPTOR_HEAP_DESC heapDesc = new D3D12_DESCRIPTOR_HEAP_DESC()
-            ..Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV
+            ..Type = D3D12.DESCRIPTOR_HEAP_TYPE_RTV
             ..NumDescriptors = 2
-            ..Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE
+            ..Flags = D3D12.DESCRIPTOR_HEAP_FLAG_NONE
             ..NodeMask = 0;
 
         var deviceVtbl = *(void***)pDevice;
@@ -141,14 +141,4 @@ public class DXGISwapChain {
     }
 
     public IDXGISwapChain1* ptr;
-
-    constexpr uint32 DXGI_FORMAT_R16G16B16A16_FLOAT = 10;
-    constexpr uint32 DXGI_USAGE_RENDER_TARGET_OUTPUT = 0x00000020;
-    constexpr uint32 DXGI_SCALING_NONE = 1;
-    constexpr uint32 DXGI_SWAP_EFFECT_FLIP_DISCARD = 4;
-    constexpr uint32 DXGI_ALPHA_MODE_IGNORE = 3;
-    constexpr uint32 DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING = 2048;
-    constexpr uint32 DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH = 2;
-    constexpr uint32 D3D12_DESCRIPTOR_HEAP_TYPE_RTV = 2;
-    constexpr uint32 D3D12_DESCRIPTOR_HEAP_FLAG_NONE = 0;
 }

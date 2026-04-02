@@ -95,7 +95,7 @@ public class RenderAPI {
         indices[33] = 0; indices[34] = 2; indices[35] = 3;
         indices[36] = 4; indices[37] = 0; indices[38] = 1;
 
-        _dynamicVertexBuffer = new D12Resource()..Initialize(_device.ptr, $Helpers.KBs(16), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
+        _dynamicVertexBuffer = new D12Resource()..Initialize(_device.ptr, $Helpers.KBs(16), D3D12.HEAP_TYPE_UPLOAD, D3D12.RESOURCE_STATE_GENERIC_READ);
 
         var resVtbl = *(void***)_dynamicVertexBuffer.ptr;
         var resourceName = LowLevel.CreateLPCWSTR("Dynamic vertex buffer");
@@ -116,7 +116,7 @@ public class RenderAPI {
             ..StrideInBytes = (uint32)sizeof(Vertex)
             ..SizeInBytes = $Helpers.KBs(16);
 
-        _dynamicIndexBuffer = new D12Resource()..Initialize(_device.ptr, $Helpers.KBs(16), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
+        _dynamicIndexBuffer = new D12Resource()..Initialize(_device.ptr, $Helpers.KBs(16), D3D12.HEAP_TYPE_UPLOAD, D3D12.RESOURCE_STATE_GENERIC_READ);
 
         resourceName = LowLevel.CreateLPCWSTR("Dynamic index buffer");
         hr = SetNameRes(_dynamicIndexBuffer.ptr, resourceName);
@@ -130,7 +130,7 @@ public class RenderAPI {
 
         _dynamicIBView = new D3D12_INDEX_BUFFER_VIEW()
             ..BufferLocation = GetGPUVirtualAddress(_dynamicIndexBuffer.ptr)
-            ..Format = DXGI_FORMAT_R32_UINT
+            ..Format = DXGI.FORMAT_R32_UINT
             ..SizeInBytes = $Helpers.KBs(16);
 
         memcpy(_dynamicVertexBuffer.GetCPUMemory(), (void*)verticesBox, (uint64)(sizeof(Vertex) * VerticesCount));
@@ -145,11 +145,11 @@ public class RenderAPI {
         D3D12_CPU_DESCRIPTOR_HANDLE* cpuDescriptorHandleForHeapStart = GetCPUDescriptorHandleForHeapStart(_depthDescHeap.ptr);
 
         D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = new D3D12_DEPTH_STENCIL_VIEW_DESC()
-            ..Format = DXGI_FORMAT_D32_FLOAT
-            ..ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D
+            ..Format = DXGI.FORMAT_D32_FLOAT
+            ..ViewDimension = D3D12.DSV_DIMENSION_TEXTURE2D
             ..Texture2D = (new D3D12_TEX2D_DSV()
                 ..MipSlice = 0)
-            ..Flags = D3D12_DSV_FLAG_NONE;
+            ..Flags = D3D12.DSV_FLAG_NONE;
 
         var CreateDepthStencilView = (void(ID3D12Device*, ID3D12Resource*, D3D12_DEPTH_STENCIL_VIEW_DESC*, D3D12_CPU_DESCRIPTOR_HANDLE)*~)deviceVtbl[21];
         CreateDepthStencilView(_device.ptr, _depthBuffer.ptr, &dsvDesc, *cpuDescriptorHandleForHeapStart);
@@ -179,7 +179,7 @@ public class RenderAPI {
         _viewProjectionMatrix = XMath.XMMatrixMultiply(viewMatrix, projectionMatrix);
 
         _cBPassData = new D12Resource()
-            ..Initialize(_device.ptr, Helpers.CalculateConstantBufferAlignment(sizeof(PassData)), D3D12_HEAP_TYPE_UPLOAD, D3D12_RESOURCE_STATE_GENERIC_READ);
+            ..Initialize(_device.ptr, Helpers.CalculateConstantBufferAlignment(sizeof(PassData)), D3D12.HEAP_TYPE_UPLOAD, D3D12.RESOURCE_STATE_GENERIC_READ);
 
         resourceName = LowLevel.CreateLPCWSTR("CB Pass Data");
         hr = SetNameRes(_cBPassData.ptr, resourceName);
@@ -196,12 +196,12 @@ public class RenderAPI {
         memcpy(_cBPassData.GetCPUMemory(), &_viewProjectionMatrix, (uint64)sizeof(PassData));
 
         D3D12_RESOURCE_BARRIER barrier = new D3D12_RESOURCE_BARRIER()
-            ..Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION
-            ..Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE
+            ..Type = D3D12.RESOURCE_BARRIER_TYPE_TRANSITION
+            ..Flags = D3D12.RESOURCE_BARRIER_FLAG_NONE
             ..d0 = (uint64*)_swapChain.GetCurrentRenderTarget()
             ..d1 = 0
-            ..d2 = D3D12_RESOURCE_STATE_PRESENT
-            ..d3 = D3D12_RESOURCE_STATE_RENDER_TARGET;
+            ..d2 = D3D12.RESOURCE_STATE_PRESENT
+            ..d3 = D3D12.RESOURCE_STATE_RENDER_TARGET;
 
         ID3D12GraphicsCommandList* gcl = _commandList.GFXCmd();
 
@@ -224,7 +224,7 @@ public class RenderAPI {
         ClearRenderTargetView(gcl, rtvHandle, (float32*)&color, 0, nullptr);
 
         var ClearDepthStencilView = (void(ID3D12GraphicsCommandList*, D3D12_CPU_DESCRIPTOR_HANDLE, uint32, float32, uint8, uint32, RECT*)*~)gclVtbl[47];
-        ClearDepthStencilView(gcl, dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1, 0, 0, nullptr);
+        ClearDepthStencilView(gcl, dsvHandle, D3D12.CLEAR_FLAG_DEPTH, 1, 0, 0, nullptr);
 
         var OMSetRenderTargets = (void(ID3D12GraphicsCommandList*, uint32, D3D12_CPU_DESCRIPTOR_HANDLE*, uint32, D3D12_CPU_DESCRIPTOR_HANDLE*)*~)gclVtbl[46];
         OMSetRenderTargets(gcl, 1, &rtvHandle, 0, &dsvHandle);
@@ -242,7 +242,7 @@ public class RenderAPI {
         SetPipelineState(gcl, _basePipeLine.ptr);
 
         var IASetPrimitiveTopology = (void(ID3D12GraphicsCommandList*, uint32)*~)gclVtbl[20];
-        IASetPrimitiveTopology(gcl, D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        IASetPrimitiveTopology(gcl, D3D12.PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
         var IASetVertexBuffers = (void(ID3D12GraphicsCommandList*, uint32, uint32, D3D12_VERTEX_BUFFER_VIEW*)*~)gclVtbl[44];
         IASetVertexBuffers(gcl, 0, 1, &_dynamicVBView);
@@ -267,12 +267,12 @@ public class RenderAPI {
         }
 
         barrier = new D3D12_RESOURCE_BARRIER()
-            ..Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION
-            ..Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE
+            ..Type = D3D12.RESOURCE_BARRIER_TYPE_TRANSITION
+            ..Flags = D3D12.RESOURCE_BARRIER_FLAG_NONE
             ..d0 = (uint64*)_swapChain.GetCurrentRenderTarget()
             ..d1 = 0
-            ..d2 = D3D12_RESOURCE_STATE_RENDER_TARGET
-            ..d3 = D3D12_RESOURCE_STATE_PRESENT;
+            ..d2 = D3D12.RESOURCE_STATE_RENDER_TARGET
+            ..d3 = D3D12.RESOURCE_STATE_PRESENT;
 
         ResourceBarrier(gcl, 1, &barrier);
 
@@ -295,19 +295,6 @@ public class RenderAPI {
     public void Destruct() {
         LowLevel.FreeLPCWSTR(_deviceName);
     }
-
-    constexpr uint32 D3D12_RESOURCE_BARRIER_TYPE_TRANSITION = 0;
-    constexpr uint32 D3D12_RESOURCE_BARRIER_FLAG_NONE = 0;
-    constexpr uint32 D3D12_RESOURCE_STATE_PRESENT = 0;
-    constexpr uint32 D3D12_RESOURCE_STATE_RENDER_TARGET = 4;
-    constexpr uint32 D3D12_HEAP_TYPE_UPLOAD = 2;
-    constexpr uint32 D3D12_RESOURCE_STATE_GENERIC_READ = (uint32)(((((0x1 | 0x2) | 0x40) | 0x80) | 0x200) | 0x800);
-    constexpr uint32 D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST = 4;
-    constexpr uint32 DXGI_FORMAT_D32_FLOAT = 40;
-    constexpr uint32 D3D12_DSV_DIMENSION_TEXTURE2D = 3;
-    constexpr uint32 D3D12_DSV_FLAG_NONE = 0;
-    constexpr uint32 D3D12_CLEAR_FLAG_DEPTH = 1;
-    constexpr uint32 DXGI_FORMAT_R32_UINT = 42;
 
     [DllImport("msvcrt.dll", CallingConvention: CallingConvention.Cdecl)]
     static extern void* memcpy(void* dest, void* src, uint64 count);

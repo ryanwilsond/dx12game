@@ -5,31 +5,31 @@ public class D12Resource {
     public void Initialize(ID3D12Device* pDevice, uint32 numBytes, uint32 heapType, uint32 initialState) {
         D3D12_HEAP_PROPERTIES heapProp = new D3D12_HEAP_PROPERTIES()
             ..Type = heapType
-            ..CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN
-            ..MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN
+            ..CPUPageProperty = D3D12.CPU_PAGE_PROPERTY_UNKNOWN
+            ..MemoryPoolPreference = D3D12.MEMORY_POOL_UNKNOWN
             ..CreationNodeMask = 0
             ..VisibleNodeMask = 0;
 
         D3D12_RESOURCE_DESC resDesc = new D3D12_RESOURCE_DESC()
-            ..Dimension = D3D12_RESOURCE_DIMENSION_BUFFER
+            ..Dimension = D3D12.RESOURCE_DIMENSION_BUFFER
             ..Alignment = 0
             ..Width = numBytes
             ..Height = 1
             ..DepthOrArraySize = 1
             ..MipLevels = 1
-            ..Format = DXGI_FORMAT_UNKNOWN
+            ..Format = DXGI.FORMAT_UNKNOWN
             ..SampleDesc = (new DXGI_SAMPLE_DESC()
                 ..Count = 1
                 ..Quality = 0)
-            ..Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR
-            ..Flags = D3D12_RESOURCE_FLAG_NONE;
+            ..Layout = D3D12.TEXTURE_LAYOUT_ROW_MAJOR
+            ..Flags = D3D12.RESOURCE_FLAG_NONE;
 
         // __uuid(ID3D12Resource)
         var resGuid = Helpers.MakeGUID(0x696442be, 0xa72e, 0x4059, new int![] { 0xbc, 0x79, 0x5b, 0x5c, 0x98, 0x04, 0x0f, 0xad });
 
         var deviceVtbl = *(void***)pDevice;
         var CreateCommittedResource = (int32(ID3D12Device*, D3D12_HEAP_PROPERTIES*, uint32, D3D12_RESOURCE_DESC*, uint32, void*, GUID*, void**)*~)deviceVtbl[27];
-        var hr = CreateCommittedResource(pDevice, &heapProp, D3D12_HEAP_FLAG_NONE, &resDesc, initialState, nullptr, &resGuid, (void**)&ptr);
+        var hr = CreateCommittedResource(pDevice, &heapProp, D3D12.HEAP_FLAG_NONE, &resDesc, initialState, nullptr, &resGuid, (void**)&ptr);
 
         if (hr != 0) {
             Console.Print("CreateCommittedResource failed: ");
@@ -40,28 +40,28 @@ public class D12Resource {
 
     public void InitializeAsDepthBuffer(ID3D12Device* pDevice, uint32 width, uint32 height) {
         D3D12_HEAP_PROPERTIES heapProp = new D3D12_HEAP_PROPERTIES()
-            ..Type = D3D12_HEAP_TYPE_DEFAULT
-            ..CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN
-            ..MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN
+            ..Type = D3D12.HEAP_TYPE_DEFAULT
+            ..CPUPageProperty = D3D12.CPU_PAGE_PROPERTY_UNKNOWN
+            ..MemoryPoolPreference = D3D12.MEMORY_POOL_UNKNOWN
             ..CreationNodeMask = 0
             ..VisibleNodeMask = 0;
 
         D3D12_RESOURCE_DESC resDesc = new D3D12_RESOURCE_DESC()
-            ..Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D
+            ..Dimension = D3D12.RESOURCE_DIMENSION_TEXTURE2D
             ..Alignment = 0
             ..Width = width
             ..Height = height
             ..DepthOrArraySize = 1
             ..MipLevels = 0
-            ..Format = DXGI_FORMAT_D32_FLOAT
+            ..Format = DXGI.FORMAT_D32_FLOAT
             ..SampleDesc = (new DXGI_SAMPLE_DESC()
                 ..Count = 1
                 ..Quality = 0)
-            ..Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN
-            ..Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+            ..Layout = D3D12.TEXTURE_LAYOUT_UNKNOWN
+            ..Flags = D3D12.RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
 
         D3D12_CLEAR_VALUE clearValue = new D3D12_CLEAR_VALUE()
-            ..Format = DXGI_FORMAT_D32_FLOAT
+            ..Format = DXGI.FORMAT_D32_FLOAT
             ..DepthStencil = (new D3D12_DEPTH_STENCIL_VALUE()
                 ..Depth = 1
                 ..Stencil = 0);
@@ -71,7 +71,7 @@ public class D12Resource {
 
         var deviceVtbl = *(void***)pDevice;
         var CreateCommittedResource = (int32(ID3D12Device*, D3D12_HEAP_PROPERTIES*, uint32, D3D12_RESOURCE_DESC*, uint32, void*, GUID*, void**)*~)deviceVtbl[27];
-        var hr = CreateCommittedResource(pDevice, &heapProp, D3D12_HEAP_FLAG_NONE, &resDesc, D3D12_RESOURCE_STATE_DEPTH_WRITE, &clearValue, &resGuid, (void**)&ptr);
+        var hr = CreateCommittedResource(pDevice, &heapProp, D3D12.HEAP_FLAG_NONE, &resDesc, D3D12.RESOURCE_STATE_DEPTH_WRITE, &clearValue, &resGuid, (void**)&ptr);
 
         if (hr != 0) {
             Console.Print("CreateCommittedResource failed: ");
@@ -108,18 +108,4 @@ public class D12Resource {
     }
 
     public ID3D12Resource* ptr;
-
-    constexpr uint32 D3D12_RESOURCE_FLAG_NONE = 0;
-    constexpr uint32 D3D12_TEXTURE_LAYOUT_ROW_MAJOR = 1;
-    constexpr uint32 DXGI_FORMAT_UNKNOWN = 0;
-    constexpr uint32 D3D12_RESOURCE_DIMENSION_BUFFER = 1;
-    constexpr uint32 D3D12_HEAP_FLAG_NONE = 0;
-    constexpr uint32 D3D12_CPU_PAGE_PROPERTY_UNKNOWN = 0;
-    constexpr uint32 D3D12_MEMORY_POOL_UNKNOWN = 0;
-    constexpr uint32 D3D12_HEAP_TYPE_DEFAULT = 1;
-    constexpr uint32 D3D12_RESOURCE_DIMENSION_TEXTURE2D = 3;
-    constexpr uint32 DXGI_FORMAT_D32_FLOAT = 40;
-    constexpr uint32 D3D12_TEXTURE_LAYOUT_UNKNOWN = 0;
-    constexpr uint32 D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL = 2;
-    constexpr uint32 D3D12_RESOURCE_STATE_DEPTH_WRITE = 0x10;
 }

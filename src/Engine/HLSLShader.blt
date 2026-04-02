@@ -3,19 +3,19 @@ public class HLSLShader {
     private ID3D10Blob* _byteCode;
 
     public void Initialize(string! fileName, uint32 shaderType) {
-        uint32 flags = (uint32)(D3DCOMPILE_DEBUG |
-                                D3DCOMPILE_SKIP_OPTIMIZATION |
-                                D3DCOMPILE_WARNINGS_ARE_ERRORS |
-                                D3DCOMPILE_ALL_RESOURCES_BOUND);
+        uint32 flags = (uint32)(D3D12.COMPILE_DEBUG |
+                                D3D12.COMPILE_SKIP_OPTIMIZATION |
+                                D3D12.COMPILE_WARNINGS_ARE_ERRORS |
+                                D3D12.COMPILE_ALL_RESOURCES_BOUND);
 
         var lFileName = LowLevel.CreateLPCWSTR(fileName);
         var lEntryPoint = LowLevel.CreateLPCSTR("main");
 
         uint8* lTarget;
 
-        if (shaderType == SHADER_TYPE_VERTEX) {
+        if (shaderType == D3D12.SHADER_TYPE_VERTEX) {
             lTarget = LowLevel.CreateLPCSTR("vs_5_1");
-        } else if (shaderType == SHADER_TYPE_PIXEL) {
+        } else if (shaderType == D3D12.SHADER_TYPE_PIXEL) {
             lTarget = LowLevel.CreateLPCSTR("ps_5_1");
         } else {
             Console.PrintLine("Unknown shader type: " + (string)shaderType);
@@ -61,15 +61,6 @@ public class HLSLShader {
     public ID3D10Blob* GetByteCode() {
         return _byteCode;
     }
-
-    public constexpr uint32 SHADER_TYPE_VERTEX = 0;
-    public constexpr uint32 SHADER_TYPE_PIXEL = 1;
-
-    constexpr uint32 D3DCOMPILE_DEBUG = (uint32)(1 << 0);
-    constexpr uint32 D3DCOMPILE_SKIP_OPTIMIZATION = (uint32)(1 << 2);
-    constexpr uint32 D3DCOMPILE_WARNINGS_ARE_ERRORS = (uint32)(1 << 18);
-    constexpr uint32 D3DCOMPILE_ALL_RESOURCES_BOUND = (uint32)(1 << 21);
-
 
     [DllImport("d3dcompiler_47.dll")]
     static extern int32 D3DCompileFromFile(char* fileName, void* defines, void* include, uint8* entrypoint, uint8* target, uint32 flags1, uint32 flags2, ID3D10Blob** code, ID3D10Blob** errorMsgs);
