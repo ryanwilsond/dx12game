@@ -32,8 +32,7 @@ public class RenderAPI {
         var factory = new DXGIFactory();
         var adapter = factory.GetAdapter();
 
-        // Debug
-        {
+#if DEBUG
             DXGI_ADAPTER_DESC desc = new DXGI_ADAPTER_DESC();
 
             var adapterVtbl = *(void***)adapter.ptr;
@@ -47,7 +46,7 @@ public class RenderAPI {
                 string gpu = LowLevel.ReadLPCWSTR((char*)&desc);
                 Console.PrintLine("Selected device: " + gpu);
             }
-        }
+#endif
 
         _device = new D12Device(adapter.ptr);
         _deviceName = LowLevel.CreateLPCWSTR("Main Virtual Device");

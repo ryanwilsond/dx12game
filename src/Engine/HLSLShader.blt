@@ -47,7 +47,9 @@ public class HLSLShader {
             return;
         }
 
+#if DEBUG
         Console.PrintLine("Loaded shader: " + fileName);
+#endif
 
         Cleanup();
 

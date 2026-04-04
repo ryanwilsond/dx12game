@@ -62,12 +62,16 @@ public class Engine {
     }
 
     public void OnCreate(int64* hWnd) {
+#if DEBUG
         Console.PrintLine("OnCreate");
+#endif
         _renderer = new RenderAPI()..Initialize(hWnd, _width, _height);
     }
 
     public void OnDestroy() {
+#if DEBUG
         Console.PrintLine("OnDestroy");
+#endif
         DXGIDebug.Get().GetLiveObjects();
         _isRunning = false;
         _renderer.Destruct();
@@ -96,7 +100,9 @@ public class Engine {
             var param = (CREATESTRUCTA*)lParam;
             var ptr = (void*)param->lpCreateParams;
             SetWindowLongPtr(hWnd, GWLP_USERDATA, (int64*)ptr);
+#if DEBUG
             Console.PrintLine("Created window");
+#endif
         } else if (msg == WM_CREATE) {
             var ptr = (void*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
             var obj = (Engine)LowLevel.GetObject(ptr);

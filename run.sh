@@ -1,1 +1,1 @@
-buckle src src/Engine
+buckle src src/Engine --debug
