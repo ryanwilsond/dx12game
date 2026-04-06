@@ -44,5 +44,5 @@ public class DXGIFactory {
     public IDXGIFactory4* ptr;
 
     [DllImport("dxgi.dll")]
-    static extern int32 CreateDXGIFactory2(uint32 flags, GUID* riid, void** factory);
+    static extern int32 CreateDXGIFactory2(uint32 flags_, GUID* riid, void** factory);
 }

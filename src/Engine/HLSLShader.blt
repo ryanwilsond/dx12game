@@ -3,10 +3,10 @@ public class HLSLShader {
     private ID3D10Blob* _byteCode;
 
     public void Initialize(string! fileName, uint32 shaderType) {
-        uint32 flags = (uint32)(D3D12.COMPILE_DEBUG |
-                                D3D12.COMPILE_SKIP_OPTIMIZATION |
-                                D3D12.COMPILE_WARNINGS_ARE_ERRORS |
-                                D3D12.COMPILE_ALL_RESOURCES_BOUND);
+        uint32 flags_ = (uint32)(D3D12.COMPILE_DEBUG |
+                                 D3D12.COMPILE_SKIP_OPTIMIZATION |
+                                 D3D12.COMPILE_WARNINGS_ARE_ERRORS |
+                                 D3D12.COMPILE_ALL_RESOURCES_BOUND);
 
         var lFileName = LowLevel.CreateLPCWSTR(fileName);
         var lEntryPoint = LowLevel.CreateLPCSTR("main");
@@ -25,7 +25,7 @@ public class HLSLShader {
 
         ID3D10Blob* errorMsgs;
 
-        var hr = D3DCompileFromFile(lFileName, nullptr, (void*)1, lEntryPoint, lTarget, flags, 0, &_byteCode, &errorMsgs);
+        var hr = D3DCompileFromFile(lFileName, nullptr, (void*)1, lEntryPoint, lTarget, flags_, 0, &_byteCode, &errorMsgs);
 
         if (hr != 0) {
             Console.Print("D3DCompileFromFile failed: ");
