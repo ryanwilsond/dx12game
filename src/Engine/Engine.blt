@@ -96,22 +96,26 @@ public class Engine {
     }
 
     static int64* WndProcImpl(int64* hWnd, uint32 msg, int64* wParam, int64* lParam) {
-        if (msg == WM_NCCREATE) {
-            var param = (CREATESTRUCTA*)lParam;
-            var ptr = (void*)param->lpCreateParams;
-            SetWindowLongPtr(hWnd, GWLP_USERDATA, (int64*)ptr);
+        switch (msg) {
+            case WM_NCCREATE: {
+                var param = (CREATESTRUCTA*)lParam;
+                var ptr = (void*)param->lpCreateParams;
+                SetWindowLongPtr(hWnd, GWLP_USERDATA, (int64*)ptr);
 #if DEBUG
-            Console.PrintLine("Created window");
+                Console.PrintLine("Created window");
 #endif
-        } else if (msg == WM_CREATE) {
-            var ptr = (void*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-            var obj = (Engine)LowLevel.GetObject(ptr);
-            obj.OnCreate(hWnd);
-        } else if (msg == WM_DESTROY) {
-            var ptr = (void*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-            var obj = (Engine)LowLevel.GetObject(ptr);
-            obj.OnDestroy();
-            PostQuitMessage(0);
+            }
+            case WM_CREATE: {
+                var ptr = (void*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+                var obj = (Engine)LowLevel.GetObject(ptr);
+                obj.OnCreate(hWnd);
+            }
+            case WM_DESTROY: {
+                var ptr = (void*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+                var obj = (Engine)LowLevel.GetObject(ptr);
+                obj.OnDestroy();
+                PostQuitMessage(0);
+            }
         }
 
         return DefWindowProc(hWnd, msg, wParam, lParam);

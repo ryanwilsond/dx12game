@@ -1,1 +1,1 @@
-buckle src src/Engine --debug --verbose --verbose-path=.ignore
+buckle src/* --debug --verbose --verbose-path=.ignore
